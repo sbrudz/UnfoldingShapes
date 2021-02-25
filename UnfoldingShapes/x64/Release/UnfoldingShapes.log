@@ -1,0 +1,42 @@
+﻿  ImageLoader.cpp
+  Main.cpp
+c:\users\erik\source\repos\unfoldingshapes\libresources\include\shader.h(61): warning C4101: 'e': unreferenced local variable
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(79): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(80): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(100): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(171): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(172): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(176): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(177): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(178): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(179): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(195): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(196): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(198): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(199): warning C4244: '*=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(209): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\camera.h(210): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\mesh.h(121): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\mesh.h(161): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\graphicsengine.h(324): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(51): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(56): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(57): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(76): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(77): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(81): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(85): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(139): warning C4244: 'initializing': conversion from '_Rep' to 'int', possible loss of data
+          with
+          [
+              _Rep=__int64
+          ]
+c:\users\erik\source\repos\unfoldingshapes\unfoldingshapes\main.cpp(144): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  glad.c
+c:\program files (x86)\windows kits\10\include\10.0.17763.0\shared\minwindef.h(130): warning C4005: 'APIENTRY': macro redefinition
+  c:\users\erik\source\repos\unfoldingshapes\libresources\include\glad\glad.h(32): note: see previous definition of 'APIENTRY'
+LINK : warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  All 1463 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  UnfoldingShapes.vcxproj -> C:\Users\Erik\source\repos\UnfoldingShapes\x64\Release\UnfoldingShapes.exe
