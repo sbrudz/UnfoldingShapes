@@ -26,6 +26,9 @@
 
 inline unsigned int TextureFromFile(const char *path, const string &directory, int samples = 1, bool gamma = false);
 
+// prototypes
+bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
+
 //Do not reinitialize the model
 class Model {
 public:
@@ -131,7 +134,12 @@ private:
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-			meshes.push_back(processMesh(mesh, scene));
+
+			vector<Mesh> tempMeshes = processMesh(mesh, scene);
+
+			for (int x = 0; x < tempMeshes.size(); x++) {
+				meshes.push_back(tempMeshes[x]);
+			}
 		}
 		//do the same for each of its children
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -140,7 +148,7 @@ private:
 		}
 	}
 
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+	vector<Mesh> processMesh(aiMesh *mesh, const aiScene *scene)
 	{
 		vector<Vertex> vertices;
 		vector<unsigned int> indices;
@@ -194,15 +202,6 @@ private:
 			}
 
 			vertices.push_back(vertex);
-		}
-
-		//process indices
-		//go through each face and retrieve vertex indicies
-		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace face = mesh->mFaces[i];
-			for (unsigned int j = 0; j < face.mNumIndices; j++)
-				indices.push_back(face.mIndices[j]);
 		}
 
 		//process material
@@ -270,13 +269,154 @@ private:
 		}
 		std::cout << std::endl;
 
+		std::cout << "faces: " << mesh->mNumFaces << std::endl;
+
+		
 		std::cout << "indices(" << indices.size() << "): ";
 		for (int x = 0; x < indices.size(); x++) {
 			std::cout << indices[x] << ", ";
 		}
 		std::cout << std::endl;
+		
 
-		return Mesh(vertices, indices, textures, materials, samples);
+		//process indices
+		//go through each face and retrieve vertex indicies
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+				indices.push_back(face.mIndices[j]);
+		}
+
+		// consolidate indicies to decide faces
+		vector<vector<unsigned int>> consolidatedIndices;
+
+		// populate the temp list
+		for (int i = 0; i < indices.size(); i+=3) {
+			consolidatedIndices.push_back(vector<unsigned int>());
+			consolidatedIndices[consolidatedIndices.size() - 1].push_back(indices[i]);
+			consolidatedIndices[consolidatedIndices.size() - 1].push_back(indices[i + 1]);
+			consolidatedIndices[consolidatedIndices.size() - 1].push_back(indices[i + 2]);
+		}
+
+		for (int i = 0; i < consolidatedIndices.size(); i++) {
+			vector<int> toRemove;
+			for (int j = i+1; j < consolidatedIndices.size(); j++) {
+				vector<Vertex> vertices1;
+				vector<Vertex> vertices2;
+
+				vertices1.push_back(vertices[consolidatedIndices[i][0]]);
+				vertices1.push_back(vertices[consolidatedIndices[i][1]]);
+				vertices1.push_back(vertices[consolidatedIndices[i][2]]);
+
+				vertices2.push_back(vertices[consolidatedIndices[j][0]]);
+				vertices2.push_back(vertices[consolidatedIndices[j][1]]);
+				vertices2.push_back(vertices[consolidatedIndices[j][2]]);
+
+				// if the two faces are tangant, then add j to i and remove j.
+				if (tangantFace(vertices1, vertices2)) {
+					toRemove.push_back(j);
+
+					consolidatedIndices[i].push_back(consolidatedIndices[j][0]);
+					consolidatedIndices[i].push_back(consolidatedIndices[j][1]);
+					consolidatedIndices[i].push_back(consolidatedIndices[j][2]);
+				}
+			}
+
+			// erase consolidated scrap
+			for (int j = toRemove.size() - 1; j >= 0; j--) {
+				consolidatedIndices.erase(consolidatedIndices.begin() + toRemove[j]);
+			}
+		}
+
+		std::cout << "init packing" << std::endl;
+
+		// pack output meshes with the proper vertices and indicies based on face
+		vector<Mesh> output;
+
+		for (int i = 0; i < consolidatedIndices.size(); i++) {
+			std::cout << "Packing face: " << i + 1 << " of " << consolidatedIndices.size() << std::endl;
+
+			vector<Vertex> consolidatedVertices;
+			vector<unsigned int> compressedIndices = consolidatedIndices[i];
+
+			std::cout << "indices 1 (" << compressedIndices.size() << "): ";
+			for (int x = 0; x < compressedIndices.size(); x++) {
+				std::cout << compressedIndices[x] << ", ";
+			}
+			std::cout << std::endl;
+
+			// sort indicies (bubble sort)
+			for (int j = 0; j < compressedIndices.size(); j++) {
+				for (int g = 0; g < compressedIndices.size() - j - 1; g++) {
+					if (compressedIndices[g] > compressedIndices[g+1]) {
+						unsigned int temp = compressedIndices[g + 1];
+						compressedIndices[g + 1] = compressedIndices[g];
+						compressedIndices[g] = temp;
+					}
+				}
+			}
+
+			std::cout << "indices 2 (" << compressedIndices.size() << "): ";
+			for (int x = 0; x < compressedIndices.size(); x++) {
+				std::cout << compressedIndices[x] << ", ";
+			}
+			std::cout << std::endl;
+
+			// remove duplicates
+			for (int j = compressedIndices.size() - 2; j >= 0; j--) {
+				if (compressedIndices[j] == compressedIndices[j + 1]) {
+					compressedIndices.erase(compressedIndices.begin() + j + 1);
+				}
+			}
+
+			std::cout << "indices 3 (" << compressedIndices.size() << "): ";
+			for (int x = 0; x < compressedIndices.size(); x++) {
+				std::cout << compressedIndices[x] << ", ";
+			}
+			std::cout << std::endl;
+
+			// populate vertices
+			for (int j = 0; j < compressedIndices.size(); j++) {
+				consolidatedVertices.push_back(vertices[compressedIndices[j]]);
+			}
+
+			// repair indice list (match compressed to uncompressed)
+			vector<unsigned int> repairedIndices = consolidatedIndices[i];
+			for (int j = 0; j < consolidatedIndices[i].size(); j++) {
+				for (int g = 0; g < compressedIndices.size(); g++) {
+					if (compressedIndices[g] == repairedIndices[j]) {
+						repairedIndices[j] = g;
+					}
+				}
+			}
+
+			
+			std::cout << "vertices(" << consolidatedVertices.size() << "): ";
+			for (int x = 0; x < consolidatedVertices.size(); x++) {
+				std::cout << consolidatedVertices[x].Position.x << "," << consolidatedVertices[x].Position.y << "," << consolidatedVertices[x].Position.z << " ";
+			}
+			std::cout << std::endl;
+
+			std::cout << "indices condensed(" << consolidatedIndices[i].size() << "): ";
+			for (int x = 0; x < consolidatedIndices[i].size(); x++) {
+				std::cout << consolidatedIndices[i][x] << ", ";
+			}
+			std::cout << std::endl;
+
+			std::cout << "indices(" << repairedIndices.size() << "): ";
+			for (int x = 0; x < repairedIndices.size(); x++) {
+				std::cout << repairedIndices[x] << ", ";
+			}
+			std::cout << std::endl;
+			std::cout << std::endl;
+
+			output.push_back(Mesh(consolidatedVertices, repairedIndices, textures, materials, samples));
+		}
+
+		std::cout << "finished packing" << std::endl;
+
+		return output;
 	}
 
 	//unpacks the textures from assimp into the texture struct so it's more manipulatable
@@ -367,5 +507,32 @@ unsigned int TextureFromFile(const char *path, const string &directory, int samp
 
 	return textureID;
 };
+
+// utility
+glm::vec4 getPlane(vector<Vertex> vert) {
+	float a1 = vert[1].Position.x - vert[0].Position.x;
+	float b1 = vert[1].Position.y - vert[0].Position.y;
+	float c1 = vert[1].Position.z - vert[0].Position.z;
+	float a2 = vert[2].Position.x - vert[0].Position.x;
+	float b2 = vert[2].Position.y - vert[0].Position.y;
+	float c2 = vert[2].Position.z - vert[0].Position.z;
+	float a = b1 * c2 - b2 * c1;
+	float b = a2 * c1 - a1 * c2;
+	float c = a1 * b2 - b1 * a2;
+	float d = (-a * vert[1].Position.x - b * vert[1].Position.y - c * vert[1].Position.z);
+
+	return glm::vec4(a, b, c, d);
+}
+
+bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2) {
+	glm::vec4 plane1 = getPlane(vertices1);
+	glm::vec4 plane2 = getPlane(vertices2);
+
+	if (plane1 == plane2) {
+		return true;
+	}
+
+	return false;
+}
 
 #endif

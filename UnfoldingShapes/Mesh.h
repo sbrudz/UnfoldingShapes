@@ -23,6 +23,20 @@ struct Vertex {
 	glm::vec3 Tangent;
 	// bitangent
 	glm::vec3 Bitangent;
+
+	bool operator==(const Vertex& v2)
+	{
+		if (Position == v2.Position &&
+			Normal == v2.Normal &&
+			TexCoords == v2.TexCoords &&
+			Tangent == v2.Tangent &&
+			Bitangent == v2.Bitangent) 
+		{
+			return true;
+		}
+
+		return false;
+	}
 };
 
 struct Texture {
