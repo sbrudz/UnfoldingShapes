@@ -69,7 +69,7 @@ public:
 	const unsigned int *SCR_HEIGHT;
 
 	// list of active models
-	std::vector<Model> models;
+	std::vector<Model*> models;
 
 	// list of the physical models with all the transforms applied
 	std::vector<Asset*> scene;
@@ -220,14 +220,14 @@ public:
 
 	// model functions
 	Model *getModel(int index) {
-		return &models[index];
+		return models[index];
 	}
 
 	Model *getModel(string str) {
 		for (int i = 0; i < models.size(); i++) {
-			if (models[i].name == str) {
+			if (models[i]->name == str) {
 				// std::cout << "Name found: " << models[i].name << " vs. " << str << std::endl;
-				return &models[i];
+				return models[i];
 			}
 		}
 
@@ -237,7 +237,7 @@ public:
 
 	void addModel(string const &path) {
 		std::cout << "Added model at location: " << path << std::endl;
-		models.push_back(Model(path, samples));
+		models.push_back(new Model(path, samples));
 	}
 
 	// asset stuff

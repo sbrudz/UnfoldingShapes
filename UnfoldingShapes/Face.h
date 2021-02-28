@@ -15,10 +15,45 @@
 
 // graphics method for each face
 class Face {
-	Mesh mesh;
+public:
+	Mesh* mesh;
+
+	glm::vec3 rot;
+
+	struct Axis {
+		glm::vec3 point1;
+		glm::vec3 point2;
+		
+		Axis(glm::vec3 p1, glm::vec3 p2) {
+			point1 = p1;
+			point2 = p2;
+		}
+
+		glm::vec3 rotateAbout(glm::vec3 point) {
+			return point;
+		}
+
+		bool operator==(Axis a) {
+			if (point1 == a.point1 &&
+				point2 == a.point2) 
+			{
+				return true;
+			}
+
+			return false;
+		}
+	};
+
+	vector<Axis> axis;
 
 
-	Face() {
+	Face(Mesh* mesh) {
+		this->mesh = mesh;
+
+		initAxis();
+	}
+
+	void initAxis() {
 
 	}
 };

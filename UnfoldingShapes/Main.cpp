@@ -66,7 +66,7 @@ int fpsCounter;
 // game
 int gameState;
 
-Asset* cube;
+vector<Shape> shapes;
 
 void setup() {
 	// set window size to max while also maintaining size ratio
@@ -89,7 +89,6 @@ void setup() {
 	graphics = new GraphicsEngine("3D Mill", &SCR_WIDTH, &SCR_HEIGHT, 1);
 
 	// add all the models that are going to be used immediatley
-	graphics->addModel(cubeModel);
 
 	// set skybox
 	graphics->setSkybox(cloudySkybox);
@@ -107,9 +106,11 @@ void setup() {
 	//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
 
 	// add assets
-	cube = new Asset(graphics->getModel("cube.obj"));
+	shapes.push_back(Shape(cubeModel));
 
-	graphics->addAsset(cube);
+	for (int i = 0; i < shapes.size(); i++) {
+		graphics->addAsset(shapes[i].asset);
+	}
 
 	// fps and game init
 	fpsCount = 0;

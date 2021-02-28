@@ -68,5 +68,8 @@
     <ClInclude Include="Face.h">
       <Filter>Source Files\Unfold</Filter>
     </ClInclude>
+    <ClInclude Include="Graph.h">
+      <Filter>Source Files\Unfold</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
