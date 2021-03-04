@@ -101,6 +101,12 @@ public:
 		}
 	}
 
+	void rebuildMeshes() {
+		for (int i = 0; i < meshes.size(); i++) {
+			meshes[i].rebuild();
+		}
+	}
+
 private:
 	void loadModel(string const &path)
 	{

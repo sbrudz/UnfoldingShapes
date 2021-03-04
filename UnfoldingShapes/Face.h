@@ -13,6 +13,8 @@
 
 #include "Mesh.h"
 
+float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+
 // graphics method for each face
 class Face {
 public:
@@ -21,21 +23,24 @@ public:
 	glm::vec3 rot;
 
 	struct Axis {
-		glm::vec3 point1;
-		glm::vec3 point2;
+		glm::vec3 axis;
+
+		float originalAngle;
 		
-		Axis(glm::vec3 p1, glm::vec3 p2) {
-			point1 = p1;
-			point2 = p2;
+		Axis(glm::vec3 axis) {
+			this->axis = axis;
 		}
 
-		glm::vec3 rotateAbout(glm::vec3 point) {
-			return point;
+		glm::vec3 rotateAbout(glm::vec3 point, float angle) {
+			glm::mat4 rotationMat(1);
+
+			rotationMat = glm::rotate(rotationMat, angle, axis);
+
+			return glm::vec3(rotationMat * glm::vec4(point, 1.0));
 		}
 
 		bool operator==(Axis a) {
-			if (point1 == a.point1 &&
-				point2 == a.point2) 
+			if (axis == a.axis) 
 			{
 				return true;
 			}
@@ -54,8 +59,41 @@ public:
 	}
 
 	void initAxis() {
+		// find all vertices that only have two or less indices marked of them and then connect them within the triangle.
+		vector<unsigned int> validVertices;
 
+		for (int i = 0; i < mesh->vertices.size(); i++) {
+			int count = 0;
+			
+			for (int j = 0; j < mesh->indices.size(); j++) {
+				if (i == mesh->indices[j]) {
+					count++;
+				}
+			}
+
+			if (count != 0 && count <= 2) {
+				validVertices.push_back(i);
+			}
+		}
+
+		// continue where left off 3/3/21
+	}
+
+	float getArea() {
+		float area = 0;
+
+		for (int i = 0; i < mesh->indices.size(); i += 3) {
+			area += getTriangleArea(mesh->vertices[mesh->indices[i]].Position, mesh->vertices[mesh->indices[i+1]].Position, mesh->vertices[mesh->indices[i+2]].Position);
+		}
+		
+		return area;
 	}
 };
+
+float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+	glm::vec3 ortho = glm::cross(a - b, a - c);
+
+	return sqrt(ortho.x*ortho.x + ortho.y*ortho.y + ortho.z*ortho.z) / 2;
+}
 
 #endif

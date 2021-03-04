@@ -27,7 +27,7 @@ public:
 	Asset* asset;
 	Model* model;
 	
-	vector<Face> faces;
+	vector<Face*> faces;
 
 	Graph<Face> faceMap;
 
@@ -47,28 +47,35 @@ public:
 
 	void initFaces() {
 		for (int i = 0; i < model->meshes.size(); i++) {
-			faces.push_back(Face(&model->meshes[i]));
+			faces.push_back(new Face(&model->meshes[i]));
 		}
 		
 		// Largest face is the base
-		// temp (FIX LATER)
-		faceMap = Graph<Face>(&faces[0]);
+		Face* largest = faces[0];
+
+		for (int i = 1; i < faces.size(); i++) {
+			if (faces[i]->getArea() > largest->getArea()) {
+				largest = faces[i];
+			}
+		}
+		
+		faceMap = Graph<Face>(largest);
 
 		// find adjacent faces and then add them to graph (if they have the same axis)
 		for (int i = 0; i < faces.size(); i++) {
 			vector<Face*> tempFaces = vector<Face*>();
 
 			for (int j = 0; j < faces.size() && j != i; j++) {
-				for (int g = 0; g < faces[i].axis.size(); g++) {
-					for (int h = g+1; h < faces[j].axis.size(); h++) {
-						if (faces[i].axis[g] == faces[j].axis[h]) {
-							tempFaces.push_back(&faces[j]);
+				for (int g = 0; g < faces[i]->axis.size(); g++) {
+					for (int h = g+1; h < faces[j]->axis.size(); h++) {
+						if (faces[i]->axis[g] == faces[j]->axis[h]) {
+							tempFaces.push_back(faces[j]);
 						}
 					}
 				}
 			}
 
-			faceMap.addNode(&faces[i], tempFaces);
+			faceMap.addNode(faces[i], tempFaces);
 		}
 	}
 };

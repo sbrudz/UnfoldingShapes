@@ -176,6 +176,10 @@ public:
 		glBindVertexArray(0);
 	}
 
+	void rebuild() {
+		setupMesh();
+	}
+
 private:
 	//render data 
 	unsigned int VBO, EBO;

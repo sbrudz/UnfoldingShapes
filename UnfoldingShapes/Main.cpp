@@ -23,6 +23,7 @@
 // Unfold tools
 #include "Shape.h"
 #include "UnfoldSolution.h"
+#include "Unfold.h"
 
 using namespace std;
 
@@ -66,7 +67,7 @@ int fpsCounter;
 // game
 int gameState;
 
-vector<Shape> shapes;
+vector<Shape*> shapes;
 
 void setup() {
 	// set window size to max while also maintaining size ratio
@@ -106,11 +107,13 @@ void setup() {
 	//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
 
 	// add assets
-	shapes.push_back(Shape(cubeModel));
+	shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
-		graphics->addAsset(shapes[i].asset);
+		graphics->addAsset(shapes[i]->asset);
 	}
+
+	UnfoldSolution unfold = Unfold::basic(shapes[0]);
 
 	// fps and game init
 	fpsCount = 0;

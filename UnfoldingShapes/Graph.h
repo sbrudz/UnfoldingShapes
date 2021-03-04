@@ -14,6 +14,7 @@ using namespace std;
 
 template<class T>
 class Graph {
+public:
 	// prototype
 	struct Node;
 
@@ -61,9 +62,6 @@ class Graph {
 
 	Node* rootNode;
 
-public:
-	struct Node;
-
 	// You must initialize with the first Node data
 	Graph() {
 		rootNode = nullptr;
@@ -91,6 +89,10 @@ public:
 
 	Node* addNode(T* data, vector<Node*> conn) {
 		return newNode(data, conn);
+	}
+
+	Node* getBase() {
+		return rootNode;
 	}
 };
 

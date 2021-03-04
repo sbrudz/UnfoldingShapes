@@ -71,5 +71,11 @@
     <ClInclude Include="Graph.h">
       <Filter>Source Files\Unfold</Filter>
     </ClInclude>
+    <ClInclude Include="Unfold.h">
+      <Filter>Source Files\Unfold</Filter>
+    </ClInclude>
+    <ClInclude Include="Animator.h">
+      <Filter>Source Files\Unfold</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
