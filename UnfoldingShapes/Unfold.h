@@ -21,11 +21,11 @@
 // computes unfold solutions
 static class Unfold {
 private:
-	static void basicRecusivePopulation(Graph<Face>::Node* mapNode, UnfoldSolution* solution, UnfoldSolution::Node* parent) {
+	static void basicRecusivePopulation(Graph<Face>::Node* mapNode, Graph<Face>* solution, Graph<Face>::Node* parent) {
 		for (int i = 0; i < mapNode->connections.size(); i++) {
 			if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
 				// set new parent
-				parent = solution->addNode(mapNode->connections[i]->data, parent);
+				parent = solution->newNode(parent, mapNode->connections[i]->data);
 				
 				// recursive
 				basicRecusivePopulation(mapNode->connections[i], solution, parent);
@@ -34,9 +34,9 @@ private:
 	}
 
 public:
-	static UnfoldSolution basic(Shape* shape) {
+	static Graph<Face> basic(Shape* shape) {
 		// init solution with the base 
-		UnfoldSolution solution = UnfoldSolution(shape->faceMap.rootNode->data);
+		Graph<Face> solution = Graph<Face>(shape->faceMap.rootNode->data);
 
 		basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
 

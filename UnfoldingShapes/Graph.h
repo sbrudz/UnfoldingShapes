@@ -69,8 +69,8 @@ public:
 		return nullptr;
 	}
 
-	// makes a new node (specify the parent and then the data)
-	struct Node* newNode(Node* root, T* data) {
+	// makes a new node (specify the parent and then the data) (automatically adds connection to root as parent)
+	struct Node* newNode(Node* root, T* data, bool twoWayConnections = false) {
 		// check root (if null then set it as the rootNode)
 		if (root == nullptr) {
 			Node* node = new Node();
@@ -98,7 +98,9 @@ public:
 			// connect parent and child
 			root->connections.push_back(node);
 
-			node->connections.push_back(root);
+			if (twoWayConnections) {
+				node->connections.push_back(root);
+			}
 		}
 
 		// if already exists then just connect the two (double check they are not connected already)
@@ -117,16 +119,19 @@ public:
 			}
 
 			// check child
-			alreadyExists = false;
-			for (int i = 0; i < node->connections.size(); i++) {
-				if (root == node->connections[i]) {
-					alreadyExists = true;
-					break;
+			// cancel if not a two way connection setup
+			if (twoWayConnections) {
+				alreadyExists = false;
+				for (int i = 0; i < node->connections.size(); i++) {
+					if (root == node->connections[i]) {
+						alreadyExists = true;
+						break;
+					}
 				}
-			}
 
-			if (!alreadyExists) {
-				node->connections.push_back(root);
+				if (!alreadyExists) {
+					node->connections.push_back(root);
+				}
 			}
 		}
 

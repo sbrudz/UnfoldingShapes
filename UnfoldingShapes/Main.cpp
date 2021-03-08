@@ -31,6 +31,7 @@ using namespace std;
 GraphicsEngine* graphics;
 
 const char* cubeModel = "resources\\objects\\cube\\cube.obj";
+const char* ballModel = "resources\\objects\\redball\\redball.obj";
 
 // skybox paths
 const std::vector<const char*> cloudySkybox
@@ -73,7 +74,7 @@ vector<Shape*> shapes;
 Animator animator;
 
 // temp
-UnfoldSolution* unfold;
+Graph<Face> unfold;
 
 void setup() {
 	// set window size to max while also maintaining size ratio
@@ -121,8 +122,8 @@ void setup() {
 
 	animator = Animator();
 
-	unfold = &Unfold::basic(shapes[0]);
-	animator.addAnimation(shapes[0], unfold, 2);
+	unfold = Unfold::basic(shapes[0]);
+	animator.addAnimation(shapes[0], &unfold, 2);
 
 	// fps and game init
 	fpsCount = 0;

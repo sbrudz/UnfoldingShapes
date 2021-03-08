@@ -50,7 +50,7 @@ public:
 		}
 
 		bool operator==(Axis a) {
-			if (point1 == a.point1 && point2 == a.point2) 
+			if ((point1 == a.point1 && point2 == a.point2) || (point1 == a.point2 && point2 == a.point1)) 
 			{
 				return true;
 			}

@@ -50,13 +50,11 @@ private:
 	void populateFaceMap(Graph<Face>::Node* node, vector<Face*> &faces) {
 		vector<Face*> tempFaces = vector<Face*>();
 
-		std::cout << "faces size: " << faces.size() << std::endl;
+		// std::cout << "faces size: " << faces.size() << std::endl;
 		for (int i = 0; i < faces.size(); i++) {
 			for (int g = 0; g < faces[i]->axis.size(); g++) {
 				for (int h = 0; h < node->data->axis.size(); h++) {
 					// if the axis match and they are not the same face
-					//std::cout << "axis 1 " << glm::to_string(faces[i]->axis[g]->point1) << ", " << glm::to_string(faces[i]->axis[g]->point2) << endl;
-					//std::cout << "axis 2 " << glm::to_string(node->data->axis[h]->point1) << ", " << glm::to_string(node->data->axis[h]->point2) << endl;
 					if (*faces[i]->axis[g] == *node->data->axis[h] && node->data != faces[i]) {
 						tempFaces.push_back(faces[i]);
 					}
@@ -66,7 +64,7 @@ private:
 
 
 		// add all children and proccess them too
-		std::cout << "tempFaces size: " << tempFaces.size() << std::endl;
+		// std::cout << "tempFaces size: " << tempFaces.size() << std::endl;
 		for (int i = 0; i < tempFaces.size(); i++) {
 			// this prevents the recursive method from getting stuck in a loop (only run populateFaceMap once for each face)
 			bool exists = false;
@@ -74,7 +72,7 @@ private:
 				exists = true;
 			}
 
-			Graph<Face>::Node* newNode = node->graph->newNode(node, tempFaces[i]);
+			Graph<Face>::Node* newNode = node->graph->newNode(node, tempFaces[i], true);
 
 			if (exists == false) {
 				populateFaceMap(newNode, faces);

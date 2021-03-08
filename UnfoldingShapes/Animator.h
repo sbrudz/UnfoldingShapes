@@ -28,12 +28,12 @@ class Animator {
 public:
 	struct Animation {
 		Shape* shape;
-		UnfoldSolution* solution;
+		Graph<Face>* solution;
 
 		// milliseconds for animation to complete
 		float time;
 
-		Animation(Shape* shape, UnfoldSolution* solution, float time) {
+		Animation(Shape* shape, Graph<Face>* solution, float time) {
 			this->shape = shape;
 			this->solution = solution;
 			this->time = time;
@@ -56,7 +56,7 @@ public:
 		}
 	}
 
-	void addAnimation(Shape* shape, UnfoldSolution* solution, float time) {
+	void addAnimation(Shape* shape, Graph<Face>* solution, float time) {
 		animations.push_back(Animation(shape, solution, time));
 	}
 
@@ -67,32 +67,32 @@ private:
 		}
 	}
 
-	void recursiveChildRotation(UnfoldSolution::Node* root, Face::Axis* axis, float deltaTheta) {
+	void recursiveChildRotation(Graph<Face>::Node* root, Face::Axis* axis, float deltaTheta) {
 		// rotate this node and then rotate all of the children
 		rotateFaceAboutAxis(root->data, axis, deltaTheta);
 
-		for (int i = 0; i < root->children.size(); i++) {
-			recursiveChildRotation(root->children[i], axis, deltaTheta);
+		for (int i = 0; i < root->connections.size(); i++) {
+			recursiveChildRotation(root->connections[i], axis, deltaTheta);
 		}
 	}
 
-	void recursiveUpdate(UnfoldSolution::Node* root, Animation* animation) {
-		for (int i = 0; i < root->children.size(); i++) {
+	void recursiveUpdate(Graph<Face>::Node* root, Animation* animation) {
+		for (int i = 0; i < root->connections.size(); i++) {
 			// apply rotations (find the right axis)
 			Face::Axis* axis = nullptr;
 
 			for (int x = 0; x < root->data->axis.size(); x++) {
-				for (int y = 0; y < root->children[i]->data->axis.size(); y++) {
-					if (*root->data->axis[x] == *root->children[i]->data->axis[y]) {
+				for (int y = 0; y < root->connections[i]->data->axis.size(); y++) {
+					if (*root->data->axis[x] == *root->connections[i]->data->axis[y]) {
 						axis = root->data->axis[x];
 					}
 				}
 			}
 
-			recursiveChildRotation(root, axis, axis->originalAngle * (animation->time * 2000));
+			recursiveChildRotation(root, axis, axis->originalAngle / (animation->time * 100));
 
 			// proccess children
-			recursiveUpdate(root->children[i], animation);
+			recursiveUpdate(root->connections[i], animation);
 		}
 	}
 };
