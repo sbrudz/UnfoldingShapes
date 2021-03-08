@@ -19,48 +19,119 @@ public:
 	struct Node;
 
 	// vars
-	int size;
+	int size = 0;
+
+	Node* rootNode = nullptr;
 
 	struct Node {
 		int id;
 		T* data;
 
+		Graph<T>* graph;
+
 		std::vector<Node*> connections;
 	};
 
 	// depth first search for node with data (recursive)
-	struct Node* findNode(Node* root, T* data) {
-		for (int i = 0; i < root->connections.size(); i++) {
-			if (root->connections[i]->data == data) {
-				return root->connections[i];
-			}
+	struct Node* findNode(Node* root, T* data, bool searching = false) {
+		static vector<Node*> searchedNodes;
 
-			Node* attempt = findNode(root->connections[i], data);
-			if (attempt != nullptr) {
-				return attempt;
+		// empty if starting a new search
+		if (searching == false) {
+			searchedNodes = vector<Node*>();
+		}
+
+		if (root != nullptr) {
+			for (int i = 0; i < root->connections.size(); i++) {
+				if (root->connections[i]->data == data) {
+					return root->connections[i];
+				}
+
+				bool contains = false;
+				for (int j = 0; j < searchedNodes.size(); j++) {
+					if (searchedNodes[j] == root->connections[i]) {
+						contains = true;
+						break;
+					}
+				}
+
+				if (contains == false) {
+					searchedNodes.push_back(root->connections[i]);
+
+					Node* attempt = findNode(root->connections[i], data, true);
+					if (attempt != nullptr) {
+						return attempt;
+					}
+				}
 			}
 		}
 
 		return nullptr;
 	}
 
-	struct Node* newNode(T* data, vector<Node*> conn = vector<Node*>()) {
-		Node* node = new Node();
+	// makes a new node (specify the parent and then the data)
+	struct Node* newNode(Node* root, T* data) {
+		// check root (if null then set it as the rootNode)
+		if (root == nullptr) {
+			Node* node = new Node();
 
-		node->id = size++;
-		node->data = data;
+			node->id = size++;
+			node->data = data;
 
-		// link both this node and their connections
-		for (int i = 0; i < conn.size(); i++) {
-			node->connections.push_back(conn[i]);
+			node->graph = this;
 
-			conn[i]->connections.push_back(node);
+			rootNode = node;
+			return node;
+		}
+
+		// create node if root is valid
+		Node* node = findNode(rootNode, data);
+
+		if (node == nullptr) {
+			node = new Node();
+
+			node->id = size++;
+			node->data = data;
+
+			node->graph = this;
+
+			// connect parent and child
+			root->connections.push_back(node);
+
+			node->connections.push_back(root);
+		}
+
+		// if already exists then just connect the two (double check they are not connected already)
+		else {
+			// check this node
+			bool alreadyExists = false;
+			for (int i = 0; i < root->connections.size(); i++) {
+				if (node == root->connections[i]) {
+					alreadyExists = true;
+					break;
+				}
+			}
+
+			if (!alreadyExists) {
+				root->connections.push_back(node);
+			}
+
+			// check child
+			alreadyExists = false;
+			for (int i = 0; i < node->connections.size(); i++) {
+				if (root == node->connections[i]) {
+					alreadyExists = true;
+					break;
+				}
+			}
+
+			if (!alreadyExists) {
+				node->connections.push_back(root);
+			}
 		}
 
 		return node;
 	}
-
-	Node* rootNode;
 
 	// You must initialize with the first Node data
 	Graph() {
@@ -68,31 +139,7 @@ public:
 	}
 
 	Graph(T* data) {
-		rootNode = newNode(data);
-	}
-
-	// add a node based on the address of the parent node. Each number corresponds to the number of children in each branch.
-	Node* addNode(T* data, vector<T*> connData) {
-		// list of connected nodes
-		vector<Node*> conn;
-
-		for (int i = 0; i < connData.size(); i++) {
-			Node* temp = findNode(rootNode, connData[i]);
-
-			if (temp != nullptr) {
-				conn.push_back(temp);
-			}
-		}
-
-		return newNode(data, conn);
-	}
-
-	Node* addNode(T* data, vector<Node*> conn) {
-		return newNode(data, conn);
-	}
-
-	Node* getBase() {
-		return rootNode;
+		rootNode = newNode(nullptr, data);
 	}
 };
 

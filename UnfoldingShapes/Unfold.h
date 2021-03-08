@@ -36,9 +36,9 @@ private:
 public:
 	static UnfoldSolution basic(Shape* shape) {
 		// init solution with the base 
-		UnfoldSolution solution = UnfoldSolution(shape->faceMap.getBase()->data);
+		UnfoldSolution solution = UnfoldSolution(shape->faceMap.rootNode->data);
 
-		basicRecusivePopulation(shape->faceMap.getBase(), &solution, solution.rootNode);
+		basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
 
 		return solution;
 	}

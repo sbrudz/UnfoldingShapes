@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include <iostream>
 #include <vector>
@@ -44,6 +45,42 @@ public:
 
 		initFaces();
 	}
+private:
+	// recursivley populate the faceMap
+	void populateFaceMap(Graph<Face>::Node* node, vector<Face*> &faces) {
+		vector<Face*> tempFaces = vector<Face*>();
+
+		std::cout << "faces size: " << faces.size() << std::endl;
+		for (int i = 0; i < faces.size(); i++) {
+			for (int g = 0; g < faces[i]->axis.size(); g++) {
+				for (int h = 0; h < node->data->axis.size(); h++) {
+					// if the axis match and they are not the same face
+					//std::cout << "axis 1 " << glm::to_string(faces[i]->axis[g]->point1) << ", " << glm::to_string(faces[i]->axis[g]->point2) << endl;
+					//std::cout << "axis 2 " << glm::to_string(node->data->axis[h]->point1) << ", " << glm::to_string(node->data->axis[h]->point2) << endl;
+					if (*faces[i]->axis[g] == *node->data->axis[h] && node->data != faces[i]) {
+						tempFaces.push_back(faces[i]);
+					}
+				}
+			}
+		}
+
+
+		// add all children and proccess them too
+		std::cout << "tempFaces size: " << tempFaces.size() << std::endl;
+		for (int i = 0; i < tempFaces.size(); i++) {
+			// this prevents the recursive method from getting stuck in a loop (only run populateFaceMap once for each face)
+			bool exists = false;
+			if (node->graph->findNode(node->graph->rootNode, tempFaces[i]) != nullptr) {
+				exists = true;
+			}
+
+			Graph<Face>::Node* newNode = node->graph->newNode(node, tempFaces[i]);
+
+			if (exists == false) {
+				populateFaceMap(newNode, faces);
+			}
+		}
+	}
 
 	void initFaces() {
 		for (int i = 0; i < model->meshes.size(); i++) {
@@ -59,23 +96,48 @@ public:
 			}
 		}
 		
+		// make the faceMap
 		faceMap = Graph<Face>(largest);
+		populateFaceMap(faceMap.rootNode, faces);
 
-		// find adjacent faces and then add them to graph (if they have the same axis)
+		// use the facemap to assign original angles to each of the faces
 		for (int i = 0; i < faces.size(); i++) {
-			vector<Face*> tempFaces = vector<Face*>();
+			Graph<Face>::Node* current = faceMap.findNode(faceMap.rootNode, faces[i]);
 
-			for (int j = 0; j < faces.size() && j != i; j++) {
-				for (int g = 0; g < faces[i]->axis.size(); g++) {
-					for (int h = g+1; h < faces[j]->axis.size(); h++) {
-						if (faces[i]->axis[g] == faces[j]->axis[h]) {
-							tempFaces.push_back(faces[j]);
+			// search through all of the nodes and find the angles between them and their connections.
+			for (int j = 0; j < current->connections.size(); j++) {
+				// identify shared axis
+				for (int g = 0; g < current->connections[j]->data->axis.size(); g++) {
+					for (int h = 0; h < current->data->axis.size(); h++) {
+						if (*current->data->axis[h] == *current->connections[j]->data->axis[g]) {
+							// identify leftover points to compare to find the angle
+							glm::vec3 vertex1;
+							glm::vec3 vertex2;
+
+							for (int k = 0; k < current->data->mesh->indices.size(); k++) {
+								// if point is not on axis
+								vertex1 = current->data->mesh->vertices[current->data->mesh->indices[k]].Position;
+								if (vertex1 != current->data->axis[h]->point1 && vertex1 != current->data->axis[h]->point2) {
+									break;
+								}
+							}
+
+							for (int k = 0; k < current->connections[j]->data->mesh->indices.size(); k++) {
+								// if point is not on axis
+								vertex2 = current->connections[j]->data->mesh->vertices[current->connections[j]->data->mesh->indices[k]].Position;
+								if (vertex2 != current->connections[j]->data->axis[g]->point1 && vertex2 != current->connections[j]->data->axis[g]->point2) {
+									break;
+								}
+							}
+
+							// set axis original angle.
+							float angle = current->data->axis[h]->orientedAngle(vertex1, vertex2);
+							current->data->axis[h]->originalAngle = angle;
+							current->connections[j]->data->axis[g]->originalAngle = angle;
 						}
 					}
 				}
 			}
-
-			faceMap.addNode(faces[i], tempFaces);
 		}
 	}
 };

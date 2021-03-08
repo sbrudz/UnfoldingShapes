@@ -24,6 +24,7 @@
 #include "Shape.h"
 #include "UnfoldSolution.h"
 #include "Unfold.h"
+#include "Animator.h"
 
 using namespace std;
 
@@ -69,6 +70,11 @@ int gameState;
 
 vector<Shape*> shapes;
 
+Animator animator;
+
+// temp
+UnfoldSolution* unfold;
+
 void setup() {
 	// set window size to max while also maintaining size ratio
 	RECT rect;
@@ -113,7 +119,10 @@ void setup() {
 		graphics->addAsset(shapes[i]->asset);
 	}
 
-	UnfoldSolution unfold = Unfold::basic(shapes[0]);
+	animator = Animator();
+
+	unfold = &Unfold::basic(shapes[0]);
+	animator.addAnimation(shapes[0], unfold, 2);
 
 	// fps and game init
 	fpsCount = 0;
@@ -131,6 +140,7 @@ int main() {
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
 		// Main
+		animator.update();
 
 		// render frame
 		gameState = graphics->renderFrame();
