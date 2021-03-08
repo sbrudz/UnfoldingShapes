@@ -75,7 +75,7 @@ private:
 			Graph<Face>::Node* newNode = node->graph->newNode(node, tempFaces[i], true);
 
 			if (exists == false) {
-				populateFaceMap(newNode, faces);
+				populateFaceMap(newNode, faces); 
 			}
 		}
 	}
@@ -115,7 +115,7 @@ private:
 							for (int k = 0; k < current->data->mesh->indices.size(); k++) {
 								// if point is not on axis
 								vertex1 = current->data->mesh->vertices[current->data->mesh->indices[k]].Position;
-								if (vertex1 != current->data->axis[h]->point1 && vertex1 != current->data->axis[h]->point2) {
+								if (current->data->axis[h]->hasPoint(vertex1) == false) {
 									break;
 								}
 							}
@@ -123,7 +123,7 @@ private:
 							for (int k = 0; k < current->connections[j]->data->mesh->indices.size(); k++) {
 								// if point is not on axis
 								vertex2 = current->connections[j]->data->mesh->vertices[current->connections[j]->data->mesh->indices[k]].Position;
-								if (vertex2 != current->connections[j]->data->axis[g]->point1 && vertex2 != current->connections[j]->data->axis[g]->point2) {
+								if (current->connections[j]->data->axis[g]->hasPoint(vertex2) == false) {
 									break;
 								}
 							}

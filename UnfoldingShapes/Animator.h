@@ -63,7 +63,12 @@ public:
 private:
 	void rotateFaceAboutAxis(Face* face, Face::Axis* axis, float deltaTheta) {
 		for (int i = 0; i < face->mesh->vertices.size(); i++) {
+			// rotate vertices and axis
 			face->mesh->vertices[i].Position = axis->rotateAbout(face->mesh->vertices[i].Position, deltaTheta);
+		}
+
+		for (int j = 0; j < face->axis.size(); j++) {
+			face->axis[j]->rotateAxisAbout(axis, deltaTheta);
 		}
 	}
 

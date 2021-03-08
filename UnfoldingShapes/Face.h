@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/closest_point.hpp>
 
 #include <shader.h>
 
@@ -23,34 +24,68 @@ public:
 	glm::vec3 rot;
 
 	struct Axis {
-		glm::vec3 point1;
-		glm::vec3 point2;
+		const float marginOfError = 0.0001f;
+
+		// stores the axis with a point for refrence and the vector of the line
+		glm::vec3 point;
+		glm::vec3 line;
 
 		float originalAngle;
 		
 		Axis(glm::vec3 p1, glm::vec3 p2) {
-			point1 = p1;
-			point2 = p2;
+			// normalize and get abs to standardize it
+			line = glm::abs(glm::normalize(p1 - p2));
+
+			point = glm::closestPointOnLine(glm::vec3(0), p1 + line*-1000000.0f, p2 + line*1000000.0f);
 		}
 
-		glm::vec3 rotateAbout(glm::vec3 point, float angle) {
+		glm::vec3 rotateAbout(glm::vec3 p, float angle) {
 			glm::mat4 rotationMat(1);
 
-			rotationMat = glm::rotate(rotationMat, angle, point2-point1);
+			rotationMat = glm::rotate(rotationMat, angle, line);
 
 			// translate the point to its relative position on the axis and then back to is actual position.
-			return glm::vec3(rotationMat * glm::vec4(point-point1, 1.0)) + point1;
+			return glm::vec3(rotationMat * glm::vec4(p-point, 1.0)) + point;
+		}
+
+		// transform this axis based on another axis
+		void rotateAxisAbout(Axis* axis, float angle) {
+			//std::cout << "1 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
+			glm::vec3 point1 = line * -1.0f + point;
+			glm::vec3 point2 = line * 1.0f + point;
+
+			point1 = axis->rotateAbout(point1, angle);
+			point2 = axis->rotateAbout(point2, angle);
+
+			// normalize and get abs to standardize it
+			line = glm::abs(glm::normalize(point1 - point2));
+
+			point = glm::closestPointOnLine(glm::vec3(0), point1 + line * -1000000.0f, point2 + line * 1000000.0f);
+
+			//std::cout << "2 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
 		}
 
 		float orientedAngle(glm::vec3 p1, glm::vec3 p2) {
-			p1 = p1 - point1;
-			p2 = p2 - point1;
+			p1 = p1 - point;
+			p2 = p2 - point;
 
-			return glm::orientedAngle(p1, p2, point2 - point1);
+			return glm::orientedAngle(p1, p2, line);
+		}
+
+		// check if the axis contains a point
+		bool hasPoint(glm::vec3 p) {
+			//std::cout << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
+			glm::vec3 pointOnLine = glm::closestPointOnLine(p, point + line * -1000000.0f, point + line * 1000000.0f);
+
+			if (glm::distance(pointOnLine, p) <= marginOfError) {
+				return true;
+			}
+
+			return false;
 		}
 
 		bool operator==(Axis a) {
-			if ((point1 == a.point1 && point2 == a.point2) || (point1 == a.point2 && point2 == a.point1)) 
+			if (glm::distance(point, a.point) <= marginOfError && glm::distance(line, a.line) <= marginOfError)
 			{
 				return true;
 			}
