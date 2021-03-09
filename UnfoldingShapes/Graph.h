@@ -69,21 +69,21 @@ public:
 		return nullptr;
 	}
 
+	struct Node* newRootNode(T* data) {
+		Node* node = new Node();
+
+		node->id = size++;
+		node->data = data;
+
+		node->graph = this;
+
+		rootNode = node;
+
+		return node;
+	}
+
 	// makes a new node (specify the parent and then the data) (automatically adds connection to root as parent)
 	struct Node* newNode(Node* root, T* data, bool twoWayConnections = false) {
-		// check root (if null then set it as the rootNode)
-		if (root == nullptr) {
-			Node* node = new Node();
-
-			node->id = size++;
-			node->data = data;
-
-			node->graph = this;
-
-			rootNode = node;
-			return node;
-		}
-
 		// create node if root is valid
 		Node* node = findNode(rootNode, data);
 
@@ -144,7 +144,7 @@ public:
 	}
 
 	Graph(T* data) {
-		rootNode = newNode(nullptr, data);
+		rootNode = newRootNode(data);
 	}
 };
 

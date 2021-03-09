@@ -24,7 +24,8 @@ public:
 	glm::vec3 rot;
 
 	struct Axis {
-		const float marginOfError = 0.0001f;
+		const float marginOfError = 0.001f;
+		const float sizeCap = 500.0f;
 
 		// stores the axis with a point for refrence and the vector of the line
 		glm::vec3 point;
@@ -36,7 +37,7 @@ public:
 			// normalize and get abs to standardize it
 			line = glm::abs(glm::normalize(p1 - p2));
 
-			point = glm::closestPointOnLine(glm::vec3(0), p1 + line*-1000000.0f, p2 + line*1000000.0f);
+			point = glm::closestPointOnLine(glm::vec3(0), p1 + line * sizeCap, p2 + line * -sizeCap);
 		}
 
 		glm::vec3 rotateAbout(glm::vec3 p, float angle) {
@@ -60,7 +61,7 @@ public:
 			// normalize and get abs to standardize it
 			line = glm::abs(glm::normalize(point1 - point2));
 
-			point = glm::closestPointOnLine(glm::vec3(0), point1 + line * -1000000.0f, point2 + line * 1000000.0f);
+			point = glm::closestPointOnLine(glm::vec3(0), point1 + line * sizeCap, point2 + line * -sizeCap);
 
 			//std::cout << "2 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
 		}
@@ -75,7 +76,7 @@ public:
 		// check if the axis contains a point
 		bool hasPoint(glm::vec3 p) {
 			//std::cout << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
-			glm::vec3 pointOnLine = glm::closestPointOnLine(p, point + line * -1000000.0f, point + line * 1000000.0f);
+			glm::vec3 pointOnLine = glm::closestPointOnLine(p, point + line * sizeCap, point + line * -sizeCap);
 
 			if (glm::distance(pointOnLine, p) <= marginOfError) {
 				return true;
@@ -85,7 +86,7 @@ public:
 		}
 
 		bool operator==(Axis a) {
-			if (glm::distance(point, a.point) <= marginOfError && glm::distance(line, a.line) <= marginOfError)
+			if (hasPoint(a.point) && glm::distance(line, a.line) < marginOfError)
 			{
 				return true;
 			}

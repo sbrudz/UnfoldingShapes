@@ -94,7 +94,18 @@ private:
 				}
 			}
 
-			recursiveChildRotation(root, axis, axis->originalAngle / (animation->time * 100));
+			if (axis != nullptr) {
+				recursiveChildRotation(root->connections[i], axis, -1 * axis->originalAngle / (animation->time * 100));
+			}
+			else {
+				for (int y = 0; y < root->connections[i]->data->axis.size(); y++) {
+					std::cout << glm::to_string(root->connections[i]->data->axis[y]->line) << " " << glm::to_string(root->connections[i]->data->axis[y]->point) << std::endl;
+				}
+				for (int x = 0; x < root->data->axis.size(); x++) {
+					std::cout << glm::to_string(root->data->axis[x]->line) << " " << glm::to_string(root->data->axis[x]->point) << std::endl;
+				}
+				std::cout << axis << std::endl;
+			}
 
 			// proccess children
 			recursiveUpdate(root->connections[i], animation);

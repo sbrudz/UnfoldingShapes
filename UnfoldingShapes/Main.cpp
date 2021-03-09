@@ -99,7 +99,7 @@ void setup() {
 	// add all the models that are going to be used immediatley
 
 	// set skybox
-	graphics->setSkybox(cloudySkybox);
+	// graphics->setSkybox(cloudySkybox);
 
 	// set light
 	graphics->setLight(glm::vec3(100, 150, 100), glm::vec3(1));
@@ -107,7 +107,9 @@ void setup() {
 
 
 	// set camera starting pos
-	graphics->camera.setPos(glm::vec3(0.0f, 0.0f, -20.0f));
+	graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f));
+	graphics->camera.yaw += 45.0f;
+	graphics->camera.pitch -= 22.5f;
 
 	// set callbacks
 	//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
@@ -123,7 +125,7 @@ void setup() {
 	animator = Animator();
 
 	unfold = Unfold::basic(shapes[0]);
-	animator.addAnimation(shapes[0], &unfold, 2);
+	animator.addAnimation(shapes[0], &unfold, 6);
 
 	// fps and game init
 	fpsCount = 0;
