@@ -269,6 +269,7 @@ private:
 			textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 		}
 
+		/*
 		std::cout << "vertices(" << vertices.size() << "): ";
 		for (int x = 0; x < vertices.size(); x++) {
 			std::cout << vertices[x].Position.x << "," << vertices[x].Position.y << "," << vertices[x].Position.z << " ";
@@ -283,7 +284,7 @@ private:
 			std::cout << indices[x] << ", ";
 		}
 		std::cout << std::endl;
-		
+		*/
 
 		//process indices
 		//go through each face and retrieve vertex indicies
@@ -335,22 +336,24 @@ private:
 			}
 		}
 
-		std::cout << "init packing" << std::endl;
+		// std::cout << "init packing" << std::endl;
 
 		// pack output meshes with the proper vertices and indicies based on face
 		vector<Mesh> output;
 
 		for (int i = 0; i < consolidatedIndices.size(); i++) {
-			std::cout << "Packing face: " << i + 1 << " of " << consolidatedIndices.size() << std::endl;
+			// std::cout << "Packing face: " << i + 1 << " of " << consolidatedIndices.size() << std::endl;
 
 			vector<Vertex> consolidatedVertices;
 			vector<unsigned int> compressedIndices = consolidatedIndices[i];
 
+			/*
 			std::cout << "indices 1 (" << compressedIndices.size() << "): ";
 			for (int x = 0; x < compressedIndices.size(); x++) {
 				std::cout << compressedIndices[x] << ", ";
 			}
 			std::cout << std::endl;
+			*/
 
 			// sort indicies (bubble sort)
 			for (int j = 0; j < compressedIndices.size(); j++) {
@@ -363,11 +366,13 @@ private:
 				}
 			}
 
+			/*
 			std::cout << "indices 2 (" << compressedIndices.size() << "): ";
 			for (int x = 0; x < compressedIndices.size(); x++) {
 				std::cout << compressedIndices[x] << ", ";
 			}
 			std::cout << std::endl;
+			*/
 
 			// remove duplicates
 			for (int j = compressedIndices.size() - 2; j >= 0; j--) {
@@ -376,11 +381,13 @@ private:
 				}
 			}
 
+			/*
 			std::cout << "indices 3 (" << compressedIndices.size() << "): ";
 			for (int x = 0; x < compressedIndices.size(); x++) {
 				std::cout << compressedIndices[x] << ", ";
 			}
 			std::cout << std::endl;
+			*/
 
 			// populate vertices
 			for (int j = 0; j < compressedIndices.size(); j++) {
@@ -397,7 +404,7 @@ private:
 				}
 			}
 
-			
+			/*
 			std::cout << "vertices(" << consolidatedVertices.size() << "): ";
 			for (int x = 0; x < consolidatedVertices.size(); x++) {
 				std::cout << consolidatedVertices[x].Position.x << "," << consolidatedVertices[x].Position.y << "," << consolidatedVertices[x].Position.z << " ";
@@ -416,11 +423,12 @@ private:
 			}
 			std::cout << std::endl;
 			std::cout << std::endl;
+			*/
 
 			output.push_back(Mesh(consolidatedVertices, repairedIndices, textures, materials, samples));
 		}
 
-		std::cout << "finished packing" << std::endl;
+		// std::cout << "finished packing" << std::endl;
 
 		return output;
 	}

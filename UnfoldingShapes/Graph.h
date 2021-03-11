@@ -19,7 +19,7 @@ public:
 	struct Node;
 
 	// vars
-	int size = 0;
+	int size;
 
 	Node* rootNode = nullptr;
 

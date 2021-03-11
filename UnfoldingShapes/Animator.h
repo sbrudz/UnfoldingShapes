@@ -33,10 +33,13 @@ public:
 		// milliseconds for animation to complete
 		float time;
 
+		float progress;
+
 		Animation(Shape* shape, Graph<Face>* solution, float time) {
 			this->shape = shape;
 			this->solution = solution;
 			this->time = time;
+			progress = 0;
 		}
 	};
 
@@ -49,7 +52,10 @@ public:
 	// main update function for all animations
 	void update() {
 		for (int i = 0; i < animations.size(); i++) {
-			recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
+			if (animations[i].progress < 1.0f) {
+				recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
+				animations[i].progress += 1.0f / (100 * animations[i].time);
+			}
 
 			// rebuild the mesh for each shape
 			animations[i].shape->model->rebuildMeshes();
@@ -95,9 +101,10 @@ private:
 			}
 
 			if (axis != nullptr) {
-				recursiveChildRotation(root->connections[i], axis, -1 * axis->originalAngle / (animation->time * 100));
+				recursiveChildRotation(root->connections[i], axis, 1 * axis->originalAngle / (animation->time * 100));
 			}
 			else {
+				/*
 				for (int y = 0; y < root->connections[i]->data->axis.size(); y++) {
 					std::cout << glm::to_string(root->connections[i]->data->axis[y]->line) << " " << glm::to_string(root->connections[i]->data->axis[y]->point) << std::endl;
 				}
@@ -105,6 +112,7 @@ private:
 					std::cout << glm::to_string(root->data->axis[x]->line) << " " << glm::to_string(root->data->axis[x]->point) << std::endl;
 				}
 				std::cout << axis << std::endl;
+				*/
 			}
 
 			// proccess children

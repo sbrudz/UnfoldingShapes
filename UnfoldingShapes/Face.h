@@ -25,19 +25,27 @@ public:
 
 	struct Axis {
 		const float marginOfError = 0.001f;
-		const float sizeCap = 500.0f;
+		const float sizeCap = 10.0f;
 
 		// stores the axis with a point for refrence and the vector of the line
 		glm::vec3 point;
 		glm::vec3 line;
 
 		float originalAngle;
+
+		Axis* sharedAxis;
+		Face* neighborFace;
 		
 		Axis(glm::vec3 p1, glm::vec3 p2) {
 			// normalize and get abs to standardize it
 			line = glm::abs(glm::normalize(p1 - p2));
 
 			point = glm::closestPointOnLine(glm::vec3(0), p1 + line * sizeCap, p2 + line * -sizeCap);
+		}
+
+		void setNeighbor(Face* neighbor, Axis* axis) {
+			sharedAxis = axis;
+			neighborFace = neighbor;
 		}
 
 		glm::vec3 rotateAbout(glm::vec3 p, float angle) {
@@ -70,7 +78,22 @@ public:
 			p1 = p1 - point;
 			p2 = p2 - point;
 
-			return glm::orientedAngle(p1, p2, line);
+			float result = glm::orientedAngle(p1, p2, line);
+
+			if (result == -0) {
+				result = -3.14159;
+			}
+			if (result == 0) {
+				result = 3.14159;
+			}
+
+			// result /= 2;
+			// result -= 3.14159 / 2;
+			
+
+			std::cout << result << std::endl;
+
+			return result;
 		}
 
 		// check if the axis contains a point

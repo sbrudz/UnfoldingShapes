@@ -32,6 +32,9 @@ GraphicsEngine* graphics;
 
 const char* cubeModel = "resources\\objects\\cube\\cube.obj";
 const char* ballModel = "resources\\objects\\redball\\redball.obj";
+const char* boardModel = "resources\\objects\\3dmill\\3dmill.obj";
+const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
+const char* humanoidModel = "resources\\objects\\simplehumanoid\\simplehumanoid.obj";
 
 // skybox paths
 const std::vector<const char*> cloudySkybox
@@ -107,7 +110,7 @@ void setup() {
 
 
 	// set camera starting pos
-	graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f));
+	graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f) * 0.33f * 2.0f);
 	graphics->camera.yaw += 45.0f;
 	graphics->camera.pitch -= 22.5f;
 
@@ -116,7 +119,9 @@ void setup() {
 	//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
 
 	// add assets
-	shapes.push_back(new Shape(cubeModel));
+	// shapes.push_back(new Shape(backpackModel));
+	shapes.push_back(new Shape(ballModel));
+	// shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
@@ -124,8 +129,9 @@ void setup() {
 
 	animator = Animator();
 
-	unfold = Unfold::basic(shapes[0]);
-	animator.addAnimation(shapes[0], &unfold, 6);
+	unfold = Unfold::breadthUnfold(shapes[0]);
+	//unfold = Unfold::basic(shapes[0]);
+	animator.addAnimation(shapes[0], &unfold, 15);
 
 	// fps and game init
 	fpsCount = 0;

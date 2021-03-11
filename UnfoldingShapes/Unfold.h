@@ -33,12 +33,41 @@ private:
 		}
 	}
 
+	static void breadthRecusivePopulation(Graph<Face>::Node* mapNode, Graph<Face>* solution, Graph<Face>::Node* parent) {
+		for (int i = 0; i < mapNode->connections.size(); i++) {
+			if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
+				// set new parent
+				parent = solution->newNode(parent, mapNode->connections[i]->data);
+
+				return;
+			}
+			else {
+				// recursive
+				breadthRecusivePopulation(mapNode->connections[i], solution, parent);
+			}
+		}
+	}
+
 public:
 	static Graph<Face> basic(Shape* shape) {
 		// init solution with the base 
+		// std::cout << shape->faceMap.rootNode << std::endl;
 		Graph<Face> solution = Graph<Face>(shape->faceMap.rootNode->data);
 
 		basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
+
+		return solution;
+	}
+
+	static Graph<Face> breadthUnfold(Shape* shape) {
+		// init solution with the base 
+		// std::cout << shape->faceMap.rootNode << std::endl;
+		Graph<Face> solution = Graph<Face>(shape->faceMap.rootNode->data);
+
+		while (solution.size < shape->faceMap.size) {
+			std::cout << solution.size << " " << shape->faceMap.size << std::endl;
+			basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
+		}
 
 		return solution;
 	}

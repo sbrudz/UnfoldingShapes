@@ -62,7 +62,6 @@ private:
 			}
 		}
 
-
 		// add all children and proccess them too
 		// std::cout << "tempFaces size: " << tempFaces.size() << std::endl;
 		for (int i = 0; i < tempFaces.size(); i++) {
@@ -75,29 +74,13 @@ private:
 			Graph<Face>::Node* newNode = node->graph->newNode(node, tempFaces[i], true);
 
 			if (exists == false) {
-				populateFaceMap(newNode, faces); 
+				populateFaceMap(newNode, faces);
 			}
 		}
 	}
 
-	void initFaces() {
-		for (int i = 0; i < model->meshes.size(); i++) {
-			faces.push_back(new Face(&model->meshes[i]));
-		}
-		
-		// Largest face is the base
-		Face* largest = faces[0];
-
-		for (int i = 1; i < faces.size(); i++) {
-			if (faces[i]->getArea() > largest->getArea()) {
-				largest = faces[i];
-			}
-		}
-		
-		// make the faceMap
-		faceMap = Graph<Face>(largest);
-		populateFaceMap(faceMap.rootNode, faces);
-
+	// set the pointers of each axis for the other connected axis and the pointer to the other neighboring face
+	void initAxisInfo() {
 		// use the facemap to assign original angles to each of the faces
 		for (int i = 0; i < faces.size(); i++) {
 			Graph<Face>::Node* current = faceMap.findNode(faceMap.rootNode, faces[i]);
@@ -108,6 +91,10 @@ private:
 				for (int g = 0; g < current->connections[j]->data->axis.size(); g++) {
 					for (int h = 0; h < current->data->axis.size(); h++) {
 						if (*current->data->axis[h] == *current->connections[j]->data->axis[g]) {
+							// set pointers for the axis (pls fix u k what to do pst...(do this earlier)
+							current->data->axis[h]->setNeighbor(current->connections[j]->data, current->connections[j]->data->axis[g]);
+							current->connections[j]->data->axis[g]->setNeighbor(current->data, current->data->axis[h]);
+
 							// identify leftover points to compare to find the angle
 							glm::vec3 vertex1;
 							glm::vec3 vertex2;
@@ -131,12 +118,40 @@ private:
 							// set axis original angle.
 							float angle = current->data->axis[h]->orientedAngle(vertex1, vertex2);
 							current->data->axis[h]->originalAngle = angle;
-							current->connections[j]->data->axis[g]->originalAngle = angle;
+							// current->connections[j]->data->axis[g]->originalAngle = angle;
 						}
 					}
 				}
 			}
 		}
+	}
+
+	void initFaces() {
+		for (int i = 0; i < model->meshes.size(); i++) {
+			faces.push_back(new Face(&model->meshes[i]));
+		}
+
+		// if there are no faces the return null
+		/*
+		if (faces.size() == 0) {
+			return;
+		}
+		*/
+		
+		// Largest face is the base
+		Face* largest = faces[0];
+
+		for (int i = 1; i < faces.size(); i++) {
+			if (faces[i]->getArea() > largest->getArea()) {
+				largest = faces[i];
+			}
+		}
+		
+		// make the faceMap
+		faceMap = Graph<Face>(largest);
+		populateFaceMap(faceMap.rootNode, faces);
+
+		initAxisInfo();
 	}
 };
 
