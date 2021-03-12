@@ -25,14 +25,68 @@
 
 class Shape {
 public:
+	struct Transformation {
+		float deltaAngle;
+		Face::Axis axis;
+
+		vector<Face*> appliedFaces;
+
+		Transformation(float deltaAngle, Face::Axis* axis, Face* appliedFace) {
+			this->deltaAngle = deltaAngle;
+			this->axis = *axis;
+
+			// clear and add one
+			this->appliedFaces = vector<Face*>();
+			this->appliedFaces.push_back(appliedFace);
+		}
+
+		Transformation(float deltaAngle, Face::Axis* axis, vector<Face*> appliedFaces = vector<Face*>()) {
+			this->deltaAngle = deltaAngle;
+			this->axis = *axis;
+			this->appliedFaces = appliedFaces;
+		}
+
+		// apply the transformation
+		void apply() {
+			for (int i = 0; i < appliedFaces.size(); i++) {
+				// rotate vertices
+				for (int j = 0; j < appliedFaces[i]->mesh->vertices.size(); j++) {
+					appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, deltaAngle);
+				}
+
+				// rotate axis
+				for (int j = 0; j < appliedFaces[i]->axis.size(); j++) {
+					appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, deltaAngle);
+				}
+			}
+		}
+
+		// revert the transformation
+		void revert() {
+			for (int i = 0; i < appliedFaces.size(); i++) {
+				// rotate vertices
+				for (int j = 0; j < appliedFaces[i]->mesh->vertices.size(); j++) {
+					appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, -deltaAngle);
+				}
+
+				// rotate axis
+				for (int j = 0; j < appliedFaces[i]->axis.size(); j++) {
+					appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, -deltaAngle);
+				}
+			}
+		}
+	};
+
 	Asset* asset;
 	Model* model;
 	
 	vector<Face*> faces;
-
 	Graph<Face> faceMap;
 
 	vector<Graph<Face>> unfolds;
+
+	// stores the transformations applied to the shape so we can revert.
+	vector<Transformation> appliedTransformations;
 
 	// inactive
 	Shape() {
@@ -46,6 +100,22 @@ public:
 		asset = new Asset(this->model, pos, rot, scale);
 
 		initFaces();
+	}
+
+	// add transformation to the shape
+	void transform(float deltaAngle, Face::Axis* axis, vector<Face*> appliedFaces) {
+		appliedTransformations.push_back(Transformation(deltaAngle, axis, appliedFaces));
+		appliedTransformations[appliedTransformations.size() - 1].apply();
+	}
+
+	// undo transformations
+	void revert() {
+		// revert transformations and clear list
+		for (int i = appliedTransformations.size() - 1; i >= 0; i--) {
+			appliedTransformations[i].revert();
+
+			appliedTransformations.erase(appliedTransformations.begin() + i);
+		}
 	}
 private:
 	// recursivley populate the faceMap

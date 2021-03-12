@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/normal.hpp>
 
 #include <shader.h>
 
@@ -176,7 +177,10 @@ public:
 		glBindVertexArray(0);
 	}
 
+	// reset the mesh and also recalculate the normals
 	void rebuild() {
+		recompileNormals();
+
 		setupMesh();
 	}
 
@@ -223,6 +227,16 @@ private:
 		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
 		glBindVertexArray(0);
+	}
+
+	void recompileNormals() {
+		for (int i = 0; i < indices.size(); i+=3) {
+			glm::vec3 newNormal = glm::triangleNormal(vertices[indices[i]].Position, vertices[indices[i + 1]].Position, vertices[indices[i + 2]].Position);
+
+			vertices[indices[i]].Normal = newNormal;
+			vertices[indices[i+1]].Normal = newNormal;
+			vertices[indices[i+2]].Normal = newNormal;
+		}
 	}
 
 	glm::vec3 calcAvgPos() {

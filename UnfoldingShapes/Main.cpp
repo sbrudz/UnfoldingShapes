@@ -118,8 +118,8 @@ void setup() {
 	// add assets
 	//shapes.push_back(new Shape(backpackModel));
 	//shapes.push_back(new Shape(humanoidModel));
-	shapes.push_back(new Shape(ballModel));
-	//shapes.push_back(new Shape(cubeModel));
+	//shapes.push_back(new Shape(ballModel));
+	shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);

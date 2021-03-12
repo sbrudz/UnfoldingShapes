@@ -35,6 +35,13 @@ public:
 
 		Axis* sharedAxis = nullptr;
 		Face* neighborFace = nullptr;
+
+		// default
+		Axis() {
+			point = glm::vec3(0);
+			line = glm::vec3(0);
+			originalAngle = 0.0f;
+		}
 		
 		Axis(glm::vec3 p1, glm::vec3 p2) {
 			// normalize and get abs to standardize it
@@ -115,6 +122,18 @@ public:
 			}
 
 			return false;
+		}
+
+		Axis& operator=(const Axis& a) {
+			point = a.point;
+			line = a.line;
+
+			originalAngle = a.originalAngle;
+
+			sharedAxis = a.sharedAxis;
+			neighborFace = a.neighborFace;
+
+			return *this;
 		}
 	};
 

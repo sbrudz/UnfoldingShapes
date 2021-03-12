@@ -53,9 +53,13 @@ public:
 	void update() {
 		for (int i = 0; i < animations.size(); i++) {
 			if (animations[i].progress < 1.0f) {
-				breadthFirstUpdate(animations[i].solution->rootNode, &animations[i]);
+				// first revert
+				animations[i].shape->revert();
+
+				breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
 				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
 
+				//std::cout << animations[i].progress << std::endl;
 				animations[i].progress += 1.0f / (100 * animations[i].time);
 			}
 
@@ -69,63 +73,18 @@ public:
 	}
 
 private:
-	void rotateFaceAboutAxis(Face* face, Face::Axis* axis, float deltaTheta) {
-		for (int i = 0; i < face->mesh->vertices.size(); i++) {
-			// rotate vertices and axis
-			face->mesh->vertices[i].Position = axis->rotateAbout(face->mesh->vertices[i].Position, deltaTheta);
-		}
+	void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
+		// add face of node
+		list->push_back(root->data);
 
-		for (int j = 0; j < face->axis.size(); j++) {
-			face->axis[j]->rotateAxisAbout(axis, deltaTheta);
-		}
-	}
-
-	void recursiveChildRotation(Graph<Face>::Node* root, Face::Axis* axis, float deltaTheta) {
-		// rotate this node and then rotate all of the children
-		rotateFaceAboutAxis(root->data, axis, deltaTheta);
-
+		// process children of node
 		for (int i = 0; i < root->connections.size(); i++) {
-			recursiveChildRotation(root->connections[i], axis, deltaTheta);
-		}
-	}
-
-	// Broken (makes a cool effect though) ITS DEPTH FIRST
-	void recursiveUpdate(Graph<Face>::Node* root, Animation* animation) {
-		for (int i = 0; i < root->connections.size(); i++) {
-			// apply rotations (find the right axis)
-			Face::Axis* axis = nullptr;
-
-			for (int x = 0; x < root->data->axis.size(); x++) {\
-				// if the axis is linked to the neighbor
-				if (root->data->axis[x]->neighborFace == root->connections[i]->data) {
-					axis = root->data->axis[x];
-				}
-			}
-
-			// proccess children
-			recursiveUpdate(root->connections[i], animation);
-
-			if (axis != nullptr) {
-				recursiveChildRotation(root->connections[i], axis, 1 * axis->originalAngle / (animation->time * 100));
-				//std::cout << "main: " << glm::to_string(axis->line) << " " << glm::to_string(axis->point) << std::endl;
-				//std::cout << "shared: " << glm::to_string(axis->sharedAxis->line) << " " << glm::to_string(axis->sharedAxis->point) << std::endl;
-			}
-			else {
-				/*
-				for (int y = 0; y < root->connections[i]->data->axis.size(); y++) {
-					std::cout << glm::to_string(root->connections[i]->data->axis[y]->line) << " " << glm::to_string(root->connections[i]->data->axis[y]->point) << std::endl;
-				}
-				for (int x = 0; x < root->data->axis.size(); x++) {
-					std::cout << glm::to_string(root->data->axis[x]->line) << " " << glm::to_string(root->data->axis[x]->point) << std::endl;
-				}
-				std::cout << axis << std::endl;
-				*/
-			}
+			recursiveChildCompilation(list, root->connections[i]);
 		}
 	}
 
 	// Current working solution
-	void breadthFirstUpdate(Graph<Face>::Node* root, Animation* animation) {
+	void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
 		vector<Graph<Face>::Node*> queue;
 
 		queue.push_back(root);
@@ -148,7 +107,12 @@ private:
 
 				// apply to children
 				if (axis != nullptr) {
-					recursiveChildRotation(current->connections[i], axis, 1 * axis->originalAngle / (animation->time * 100));
+					// use the method to add all child faces attatched to the current face for the transformation of the shape.
+					vector<Face*> appliedFaces;
+					recursiveChildCompilation(&appliedFaces, current->connections[i]);
+
+					// apply to the shape
+					shape->transform(1 * axis->originalAngle * progress, axis, appliedFaces);
 				}
 
 				queue.push_back(current->connections[i]);
