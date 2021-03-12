@@ -33,6 +33,7 @@ public:
 	};
 
 	// depth first search for node with data (recursive)
+	// enable searching means that there will be no overlap of the indexed nodes.
 	struct Node* findNode(Node* root, T* data, bool searching = false) {
 		static vector<Node*> searchedNodes;
 

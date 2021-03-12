@@ -53,7 +53,9 @@ public:
 	void update() {
 		for (int i = 0; i < animations.size(); i++) {
 			if (animations[i].progress < 1.0f) {
-				recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
+				breadthFirstUpdate(animations[i].solution->rootNode, &animations[i]);
+				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
+
 				animations[i].progress += 1.0f / (100 * animations[i].time);
 			}
 
@@ -87,21 +89,26 @@ private:
 		}
 	}
 
+	// Broken (makes a cool effect though) ITS DEPTH FIRST
 	void recursiveUpdate(Graph<Face>::Node* root, Animation* animation) {
 		for (int i = 0; i < root->connections.size(); i++) {
 			// apply rotations (find the right axis)
 			Face::Axis* axis = nullptr;
 
-			for (int x = 0; x < root->data->axis.size(); x++) {
-				for (int y = 0; y < root->connections[i]->data->axis.size(); y++) {
-					if (*root->data->axis[x] == *root->connections[i]->data->axis[y]) {
-						axis = root->data->axis[x];
-					}
+			for (int x = 0; x < root->data->axis.size(); x++) {\
+				// if the axis is linked to the neighbor
+				if (root->data->axis[x]->neighborFace == root->connections[i]->data) {
+					axis = root->data->axis[x];
 				}
 			}
 
+			// proccess children
+			recursiveUpdate(root->connections[i], animation);
+
 			if (axis != nullptr) {
 				recursiveChildRotation(root->connections[i], axis, 1 * axis->originalAngle / (animation->time * 100));
+				//std::cout << "main: " << glm::to_string(axis->line) << " " << glm::to_string(axis->point) << std::endl;
+				//std::cout << "shared: " << glm::to_string(axis->sharedAxis->line) << " " << glm::to_string(axis->sharedAxis->point) << std::endl;
 			}
 			else {
 				/*
@@ -114,9 +121,38 @@ private:
 				std::cout << axis << std::endl;
 				*/
 			}
+		}
+	}
 
-			// proccess children
-			recursiveUpdate(root->connections[i], animation);
+	// Current working solution
+	void breadthFirstUpdate(Graph<Face>::Node* root, Animation* animation) {
+		vector<Graph<Face>::Node*> queue;
+
+		queue.push_back(root);
+
+		Graph<Face>::Node* current;
+
+		while (!queue.empty()) {
+			current = queue[0];
+			queue.erase(queue.begin());
+
+			for (int i = 0; i < current->connections.size(); i++) {
+				// find axis
+				Face::Axis* axis = nullptr;
+
+				for (int x = 0; x < current->data->axis.size(); x++) {
+					if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
+						axis = current->data->axis[x];
+					}
+				}
+
+				// apply to children
+				if (axis != nullptr) {
+					recursiveChildRotation(current->connections[i], axis, 1 * axis->originalAngle / (animation->time * 100));
+				}
+
+				queue.push_back(current->connections[i]);
+			}
 		}
 	}
 };

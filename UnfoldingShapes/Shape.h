@@ -32,6 +32,8 @@ public:
 
 	Graph<Face> faceMap;
 
+	vector<Graph<Face>> unfolds;
+
 	// inactive
 	Shape() {
 		asset = nullptr;
@@ -56,6 +58,10 @@ private:
 				for (int h = 0; h < node->data->axis.size(); h++) {
 					// if the axis match and they are not the same face
 					if (*faces[i]->axis[g] == *node->data->axis[h] && node->data != faces[i]) {
+						// set neighbors of each axis for pairing
+						faces[i]->axis[g]->setNeighbor(node->data, node->data->axis[h]);
+						node->data->axis[h]->setNeighbor(faces[i], faces[i]->axis[g]);
+
 						tempFaces.push_back(faces[i]);
 					}
 				}
@@ -77,6 +83,10 @@ private:
 				populateFaceMap(newNode, faces);
 			}
 		}
+
+		if (node->connections.size() > 1000) {
+			std::cout << node->connections.size() << std::endl;
+		}
 	}
 
 	// set the pointers of each axis for the other connected axis and the pointer to the other neighboring face
@@ -85,16 +95,12 @@ private:
 		for (int i = 0; i < faces.size(); i++) {
 			Graph<Face>::Node* current = faceMap.findNode(faceMap.rootNode, faces[i]);
 
-			// search through all of the nodes and find the angles between them and their connections.
-			for (int j = 0; j < current->connections.size(); j++) {
-				// identify shared axis
-				for (int g = 0; g < current->connections[j]->data->axis.size(); g++) {
+			if (current != nullptr) {
+				// search through all of the nodes and find the angles between them and their connections.
+				for (int j = 0; j < current->connections.size(); j++) {
 					for (int h = 0; h < current->data->axis.size(); h++) {
-						if (*current->data->axis[h] == *current->connections[j]->data->axis[g]) {
-							// set pointers for the axis (pls fix u k what to do pst...(do this earlier)
-							current->data->axis[h]->setNeighbor(current->connections[j]->data, current->connections[j]->data->axis[g]);
-							current->connections[j]->data->axis[g]->setNeighbor(current->data, current->data->axis[h]);
-
+						// make sure the axis is valid and has a neighbor
+						if (current->data->axis[h]->sharedAxis != nullptr) {
 							// identify leftover points to compare to find the angle
 							glm::vec3 vertex1;
 							glm::vec3 vertex2;
@@ -107,10 +113,10 @@ private:
 								}
 							}
 
-							for (int k = 0; k < current->connections[j]->data->mesh->indices.size(); k++) {
+							for (int k = 0; k < current->data->axis[h]->neighborFace->mesh->indices.size(); k++) {
 								// if point is not on axis
-								vertex2 = current->connections[j]->data->mesh->vertices[current->connections[j]->data->mesh->indices[k]].Position;
-								if (current->connections[j]->data->axis[g]->hasPoint(vertex2) == false) {
+								vertex2 = current->data->axis[h]->neighborFace->mesh->vertices[current->data->axis[h]->neighborFace->mesh->indices[k]].Position;
+								if (current->data->axis[h]->sharedAxis->hasPoint(vertex2) == false) {
 									break;
 								}
 							}
@@ -118,7 +124,7 @@ private:
 							// set axis original angle.
 							float angle = current->data->axis[h]->orientedAngle(vertex1, vertex2);
 							current->data->axis[h]->originalAngle = angle;
-							// current->connections[j]->data->axis[g]->originalAngle = angle;
+							// current->data->axis[h]-sharedAxis->originalAngle = angle;
 						}
 					}
 				}

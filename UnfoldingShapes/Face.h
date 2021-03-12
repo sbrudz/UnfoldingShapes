@@ -33,8 +33,8 @@ public:
 
 		float originalAngle;
 
-		Axis* sharedAxis;
-		Face* neighborFace;
+		Axis* sharedAxis = nullptr;
+		Face* neighborFace = nullptr;
 		
 		Axis(glm::vec3 p1, glm::vec3 p2) {
 			// normalize and get abs to standardize it
@@ -91,7 +91,7 @@ public:
 			// result -= 3.14159 / 2;
 			
 
-			std::cout << result << std::endl;
+			//std::cout << result << std::endl;
 
 			return result;
 		}

@@ -34,17 +34,27 @@ private:
 	}
 
 	static void breadthRecusivePopulation(Graph<Face>::Node* mapNode, Graph<Face>* solution, Graph<Face>::Node* parent) {
+		bool flag = false;
+
 		for (int i = 0; i < mapNode->connections.size(); i++) {
 			if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
 				// set new parent
 				parent = solution->newNode(parent, mapNode->connections[i]->data);
 
-				return;
+				flag = true;
 			}
-			else {
-				// recursive
-				breadthRecusivePopulation(mapNode->connections[i], solution, parent);
-			}
+		}
+
+		if (flag) {
+			return;
+		}
+
+		for (int i = 0; i < mapNode->connections.size(); i++) {
+			Graph<Face>::Node* node = solution->findNode(solution->rootNode, mapNode->connections[i]->data);
+
+			//if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
+				breadthRecusivePopulation(mapNode->connections[i], solution, node);
+			//}
 		}
 	}
 
@@ -66,7 +76,7 @@ public:
 
 		while (solution.size < shape->faceMap.size) {
 			std::cout << solution.size << " " << shape->faceMap.size << std::endl;
-			basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
+			breadthRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
 		}
 
 		return solution;

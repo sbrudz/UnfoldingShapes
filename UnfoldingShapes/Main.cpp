@@ -76,9 +76,6 @@ vector<Shape*> shapes;
 
 Animator animator;
 
-// temp
-Graph<Face> unfold;
-
 void setup() {
 	// set window size to max while also maintaining size ratio
 	RECT rect;
@@ -119,19 +116,22 @@ void setup() {
 	//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
 
 	// add assets
-	// shapes.push_back(new Shape(backpackModel));
+	//shapes.push_back(new Shape(backpackModel));
+	//shapes.push_back(new Shape(humanoidModel));
 	shapes.push_back(new Shape(ballModel));
-	// shapes.push_back(new Shape(cubeModel));
+	//shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
 	}
 
 	animator = Animator();
-
-	unfold = Unfold::breadthUnfold(shapes[0]);
-	//unfold = Unfold::basic(shapes[0]);
-	animator.addAnimation(shapes[0], &unfold, 15);
+	
+	// unfold = Unfold::breadthUnfold(shapes[0]);
+	for (int i = 0; i < shapes.size(); i++) {
+		shapes[i]->unfolds.push_back(Unfold::basic(shapes[0]));
+		animator.addAnimation(shapes[i], &shapes[i]->unfolds[0], 15);
+	}
 
 	// fps and game init
 	fpsCount = 0;
