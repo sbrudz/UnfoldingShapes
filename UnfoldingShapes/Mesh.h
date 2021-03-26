@@ -78,6 +78,9 @@ public:
 	//number of samples for multisampling
 	int samples;
 
+	// backup data
+	vector<Vertex> backupVertices;
+
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<Material> materials, int samples)
 	{
 		this->vertices = vertices;
@@ -87,6 +90,8 @@ public:
 		this->samples = samples;
 
 		avgPos = calcAvgPos();
+
+		this->backupVertices = vertices;
 
 		//set the vertex buffers and its attribute pointers.
 		setupMesh();

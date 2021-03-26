@@ -43,6 +43,11 @@ public:
 		}
 
 		if (root != nullptr) {
+			// first compare root and then children
+			if (root->data == data) {
+				return root;
+			}
+
 			for (int i = 0; i < root->connections.size(); i++) {
 				if (root->connections[i]->data == data) {
 					return root->connections[i];
@@ -141,10 +146,12 @@ public:
 
 	// You must initialize with the first Node data
 	Graph() {
+		size = 0;
 		rootNode = nullptr;
 	}
 
 	Graph(T* data) {
+		size = 0;
 		rootNode = newRootNode(data);
 	}
 };

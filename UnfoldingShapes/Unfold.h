@@ -66,6 +66,8 @@ public:
 
 		basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
 
+		// quick fix (remove the last element of the graph)
+
 		return solution;
 	}
 
@@ -78,6 +80,8 @@ public:
 			std::cout << solution.size << " " << shape->faceMap.size << std::endl;
 			breadthRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
 		}
+
+		std::cout << solution.size << std::endl;
 
 		return solution;
 	}

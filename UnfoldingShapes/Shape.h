@@ -48,6 +48,7 @@ public:
 
 		// apply the transformation
 		void apply() {
+			//std::cout << deltaAngle << std::endl;
 			for (int i = 0; i < appliedFaces.size(); i++) {
 				// rotate vertices
 				for (int j = 0; j < appliedFaces[i]->mesh->vertices.size(); j++) {
@@ -66,12 +67,16 @@ public:
 			for (int i = 0; i < appliedFaces.size(); i++) {
 				// rotate vertices
 				for (int j = 0; j < appliedFaces[i]->mesh->vertices.size(); j++) {
-					appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, -deltaAngle);
+					appliedFaces[i]->mesh->vertices[j].Position = appliedFaces[i]->mesh->backupVertices[j].Position;
+
+					//appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, -deltaAngle);
+					//std::cout << glm::to_string(appliedFaces[i]->mesh->vertices[j].Position) << std::endl;
 				}
 
 				// rotate axis
 				for (int j = 0; j < appliedFaces[i]->axis.size(); j++) {
-					appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, -deltaAngle);
+					// appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, -deltaAngle);
+					appliedFaces[i]->axis[j]->revert();
 				}
 			}
 		}
@@ -126,6 +131,9 @@ private:
 		for (int i = 0; i < faces.size(); i++) {
 			for (int g = 0; g < faces[i]->axis.size(); g++) {
 				for (int h = 0; h < node->data->axis.size(); h++) {
+					//std::cout << glm::to_string(node->data->axis[g]->line) << " " << glm::to_string(node->data->axis[g]->point) << std::endl;
+					//std::cout << glm::to_string(node->data->axis[g]->line) << " " << glm::to_string(node->data->axis[g]->point) << std::endl << std::endl;
+					
 					// if the axis match and they are not the same face
 					if (*faces[i]->axis[g] == *node->data->axis[h] && node->data != faces[i]) {
 						// set neighbors of each axis for pairing
@@ -137,6 +145,8 @@ private:
 				}
 			}
 		}
+
+		// std::cout << tempFaces.size() << std::endl;
 
 		// add all children and proccess them too
 		// std::cout << "tempFaces size: " << tempFaces.size() << std::endl;
@@ -153,10 +163,6 @@ private:
 				populateFaceMap(newNode, faces);
 			}
 		}
-
-		if (node->connections.size() > 1000) {
-			std::cout << node->connections.size() << std::endl;
-		}
 	}
 
 	// set the pointers of each axis for the other connected axis and the pointer to the other neighboring face
@@ -172,9 +178,10 @@ private:
 						// make sure the axis is valid and has a neighbor
 						if (current->data->axis[h]->sharedAxis != nullptr) {
 							// identify leftover points to compare to find the angle
-							glm::vec3 vertex1;
-							glm::vec3 vertex2;
+							glm::vec3 vertex1 = current->data->mesh->avgPos;
+							glm::vec3 vertex2 = current->data->axis[h]->neighborFace->mesh->avgPos;
 
+							/*
 							for (int k = 0; k < current->data->mesh->indices.size(); k++) {
 								// if point is not on axis
 								vertex1 = current->data->mesh->vertices[current->data->mesh->indices[k]].Position;
@@ -191,6 +198,8 @@ private:
 								}
 							}
 
+							*/
+
 							// set axis original angle.
 							float angle = current->data->axis[h]->orientedAngle(vertex1, vertex2);
 							current->data->axis[h]->originalAngle = angle;
@@ -205,6 +214,8 @@ private:
 	void initFaces() {
 		for (int i = 0; i < model->meshes.size(); i++) {
 			faces.push_back(new Face(&model->meshes[i]));
+
+			// faces[i]->printAxis();
 		}
 
 		// if there are no faces the return null
@@ -222,7 +233,7 @@ private:
 				largest = faces[i];
 			}
 		}
-		
+
 		// make the faceMap
 		faceMap = Graph<Face>(largest);
 		populateFaceMap(faceMap.rootNode, faces);

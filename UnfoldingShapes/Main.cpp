@@ -118,8 +118,8 @@ void setup() {
 	// add assets
 	//shapes.push_back(new Shape(backpackModel));
 	//shapes.push_back(new Shape(humanoidModel));
-	//shapes.push_back(new Shape(ballModel));
-	shapes.push_back(new Shape(cubeModel));
+	shapes.push_back(new Shape(ballModel));
+	//shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
@@ -138,6 +138,18 @@ void setup() {
 	fpsCounter = 0;
 
 	gameState = 1;
+
+	// testing
+	/*
+	Face::Axis axis = Face::Axis(glm::vec3(0,0,0), glm::vec3(0,1,0));
+	Face::Axis axis2 = Face::Axis(glm::vec3(1, 0, 0), glm::vec3(1, 0, 1));
+
+	std::cout << glm::to_string(axis2.line) << glm::to_string(axis2.point) << std::endl;
+
+	axis2.rotateAxisAbout(&axis, 3.14159f * (2 / 4.0f));
+
+	std::cout << glm::to_string(axis2.line) << glm::to_string(axis2.point) << std::endl;
+	*/
 }
 
 int main() {

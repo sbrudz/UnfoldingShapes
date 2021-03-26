@@ -15,6 +15,7 @@
 #include "Mesh.h"
 
 float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+glm::vec3 closestPointOnLine(glm::vec3 line, glm::vec3 pointOnLine, glm::vec3 target);
 
 // graphics method for each face
 class Face {
@@ -25,9 +26,12 @@ public:
 
 	struct Axis {
 		const float marginOfError = 0.001f;
-		const float sizeCap = 10.0f;
+		const float sizeCap = 1000.0f;
 
 		// stores the axis with a point for refrence and the vector of the line
+		glm::vec3 originalPoint;
+		glm::vec3 originalLine;
+
 		glm::vec3 point;
 		glm::vec3 line;
 
@@ -36,18 +40,34 @@ public:
 		Axis* sharedAxis = nullptr;
 		Face* neighborFace = nullptr;
 
+		//testing
+		glm::vec3 p1, p2;
+
 		// default
 		Axis() {
-			point = glm::vec3(0);
-			line = glm::vec3(0);
+			originalPoint = glm::vec3(0);
+			originalLine = glm::vec3(0);
+			point = originalPoint;
+			line = originalLine;
 			originalAngle = 0.0f;
 		}
 		
 		Axis(glm::vec3 p1, glm::vec3 p2) {
-			// normalize and get abs to standardize it
-			line = glm::abs(glm::normalize(p1 - p2));
+			this->p1 = p1;
+			this->p2 = p2;
 
-			point = glm::closestPointOnLine(glm::vec3(0), p1 + line * sizeCap, p2 + line * -sizeCap);
+			// normalize and get abs to standardize it
+			originalLine = glm::abs(glm::normalize(p1 - p2));
+
+			originalPoint = closestPointOnLine(originalLine, p1, glm::vec3(0));
+
+			line = originalLine;
+			point = originalPoint;
+		}
+
+		void revert() {
+			line = originalLine;
+			point = originalPoint;
 		}
 
 		void setNeighbor(Face* neighbor, Axis* axis) {
@@ -56,12 +76,12 @@ public:
 		}
 
 		glm::vec3 rotateAbout(glm::vec3 p, float angle) {
-			glm::mat4 rotationMat(1);
+			glm::mat4 rotationMat(1.0f);
 
 			rotationMat = glm::rotate(rotationMat, angle, line);
 
 			// translate the point to its relative position on the axis and then back to is actual position.
-			return glm::vec3(rotationMat * glm::vec4(p-point, 1.0)) + point;
+			return glm::vec3(rotationMat * glm::vec4(p-point, 1.0f)) + point;
 		}
 
 		// transform this axis based on another axis
@@ -76,29 +96,18 @@ public:
 			// normalize and get abs to standardize it
 			line = glm::abs(glm::normalize(point1 - point2));
 
-			point = glm::closestPointOnLine(glm::vec3(0), point1 + line * sizeCap, point2 + line * -sizeCap);
+			point = closestPointOnLine(line, point1, glm::vec3(0));
 
 			//std::cout << "2 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
 		}
 
 		float orientedAngle(glm::vec3 p1, glm::vec3 p2) {
-			p1 = p1 - point;
-			p2 = p2 - point;
+			p1 = glm::normalize(p1 - point);
+			p2 = glm::normalize(p2 - point);
 
 			float result = glm::orientedAngle(p1, p2, line);
 
-			if (result == -0) {
-				result = -3.14159;
-			}
-			if (result == 0) {
-				result = 3.14159;
-			}
-
-			// result /= 2;
-			// result -= 3.14159 / 2;
-			
-
-			//std::cout << result << std::endl;
+			// std::cout << result << std::endl;
 
 			return result;
 		}
@@ -106,7 +115,10 @@ public:
 		// check if the axis contains a point
 		bool hasPoint(glm::vec3 p) {
 			//std::cout << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
-			glm::vec3 pointOnLine = glm::closestPointOnLine(p, point + line * sizeCap, point + line * -sizeCap);
+
+			glm::vec3 pointOnLine = closestPointOnLine(line, point, p);
+
+			//std::cout << glm::to_string(pointOnLine) << " " << glm::to_string(p) << " " << glm::to_string(line) << std::endl;
 
 			if (glm::distance(pointOnLine, p) <= marginOfError) {
 				return true;
@@ -134,6 +146,10 @@ public:
 			neighborFace = a.neighborFace;
 
 			return *this;
+		}
+
+		void print() {
+			std::cout << "Line: " << glm::to_string(line) << ", Point: " << glm::to_string(point) << ", Original Points: " << glm::to_string(p1) << " " << glm::to_string(p2) << std::endl;
 		}
 	};
 
@@ -189,18 +205,21 @@ public:
 		vector<unsigned int> toRemove;
 
 		for (int i = 0; i < axis.size(); i++) {
-			bool collision = false;
+			//bool collision = false;
 
-			for (int j = i + 1; j < axis.size(); j++) {
-				if (*axis[i] == *axis[j]) {
-					toRemove.push_back(j);
-					collision = true;
+			for (int j = 0; j < axis.size(); j++) {
+				if (*axis[i] == *axis[j] && i != j) {
+					toRemove.push_back(i);
+					//toRemove.push_back(j);
+					//collision = true;
 				}
 			}
 
+			/*
 			if (collision) {
 				toRemove.push_back(i);
 			}
+			*/
 		}
 
 		// apply removal
@@ -238,7 +257,36 @@ public:
 		
 		return area;
 	}
+
+	void printAxis() {
+
+		std::cout << "Face has " << axis.size() << " axis. A center of mass at: " << glm::to_string(findCenterOfMass()) << std::endl;
+		std::cout << "Including: " << std::endl;
+		for (int i = 0; i < axis.size(); i++) {
+			axis[i]->print();
+		}
+		std::cout << std::endl;
+	}
+
+	glm::vec3 findCenterOfMass() {
+		glm::vec3 center = glm::vec3(0);
+
+		for (int i = 0; i < mesh->vertices.size(); i++) {
+			center += mesh->vertices[i].Position;
+		}
+
+		center /= mesh->vertices.size();
+
+		return center;
+	}
 };
+
+// returns the closes vec3 point to a 3d line
+glm::vec3 closestPointOnLine(glm::vec3 line, glm::vec3 pointOnLine, glm::vec3 target) {
+	glm::vec3 newPoint = target - pointOnLine;
+	float dot = glm::dot(newPoint, line);
+	return pointOnLine + line * dot;
+}
 
 float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
 	glm::vec3 ortho = glm::cross(a - b, a - c);

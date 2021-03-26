@@ -39,7 +39,7 @@ public:
 			this->shape = shape;
 			this->solution = solution;
 			this->time = time;
-			progress = 0;
+			progress = 0.0f;
 		}
 	};
 
@@ -60,7 +60,15 @@ public:
 				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
 
 				//std::cout << animations[i].progress << std::endl;
-				animations[i].progress += 1.0f / (100 * animations[i].time);
+				animations[i].progress += 2.0f * 2.0f / (100 * animations[i].time);
+			}
+			else if (animations[i].progress > 1.0f) {
+				animations[i].progress = 1.0f;
+
+				// first revert
+				animations[i].shape->revert();
+
+				breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
 			}
 
 			// rebuild the mesh for each shape
@@ -102,6 +110,8 @@ private:
 				for (int x = 0; x < current->data->axis.size(); x++) {
 					if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
 						axis = current->data->axis[x];
+
+						break;
 					}
 				}
 
@@ -112,10 +122,10 @@ private:
 					recursiveChildCompilation(&appliedFaces, current->connections[i]);
 
 					// apply to the shape
-					shape->transform(1 * axis->originalAngle * progress, axis, appliedFaces);
-				}
+					shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
 
-				queue.push_back(current->connections[i]);
+					queue.push_back(current->connections[i]);
+				}
 			}
 		}
 	}
