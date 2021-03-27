@@ -44,6 +44,7 @@ public:
 	};
 
 	Animator() {
+		activeAlgorithm = 0;
 		paused = false;
 		speed = 2.0f;
 
@@ -63,9 +64,17 @@ public:
 				// first revert
 				animations[i].shape->revert();
 
-				//breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
-				stepBasedUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
-				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
+				// identify which algorithm to use
+				switch (activeAlgorithm) {
+				case 0: {
+					stepBasedUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
+					break;
+				}
+				case 1: {
+					breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
+					break;
+				}
+				}
 
 				if (!paused) {
 					//std::cout << animations[i].progress << std::endl;
@@ -113,12 +122,21 @@ public:
 		speed += delta;
 	}
 
+	void shuffleAlgorithm() {
+		int algorithmCount = 2;
+
+		activeAlgorithm = (activeAlgorithm + 1) % algorithmCount;
+	}
+
 private:
 	vector<Animation> animations;
 
 	// controls related stuff
 	bool paused;
 	float speed;
+
+	// which of the available algortihms is being used
+	int activeAlgorithm;
 
 	void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
 		// add face of node

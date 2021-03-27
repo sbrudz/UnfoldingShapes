@@ -219,7 +219,9 @@ int main() {
 	return gameState;
 }
 
+// booleans to help make sure holding down a button does not spam something
 bool pressedEnter = false;
+bool pressedTab = false;
 
 void updateControls(GLFWwindow* window, Animator &animator) {
 	// pause or play (pressed Enter ensures that if the user holds the button then it won't try to play and pause over and over really fast)
@@ -260,5 +262,17 @@ void updateControls(GLFWwindow* window, Animator &animator) {
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		animator.scrub(-0.0025);
 		animator.pause();
+	}
+
+	// Tab - Switch Algorithm
+	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+		if (!pressedTab) {
+			pressedTab = true;
+
+			animator.shuffleAlgorithm();
+		}
+	}
+	else {
+		pressedTab = false;
 	}
 }
