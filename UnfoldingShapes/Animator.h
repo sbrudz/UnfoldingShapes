@@ -43,16 +43,23 @@ public:
 		}
 	};
 
-	vector<Animation> animations;
-
 	Animator() {
+		paused = false;
+		speed = 2.0f;
+
 		animations = vector<Animation>();
 	}
 
 	// main update function for all animations
 	void update() {
 		for (int i = 0; i < animations.size(); i++) {
-			if (animations[i].progress < 1.0f) {
+			if (animations[i].progress < 0.0f) {
+				// first revert
+				animations[i].shape->revert();
+
+				animations[i].progress = 0.0f;
+			}
+			else if (animations[i].progress < 1.0f) {
 				// first revert
 				animations[i].shape->revert();
 
@@ -60,8 +67,10 @@ public:
 				stepBasedUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
 				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
 
-				//std::cout << animations[i].progress << std::endl;
-				animations[i].progress += 1.0f * 2.0f / (100 * animations[i].time);
+				if (!paused) {
+					//std::cout << animations[i].progress << std::endl;
+					animations[i].progress += speed / (100 * animations[i].time);
+				}
 			}
 			else if (animations[i].progress > 1.0f) {
 				animations[i].progress = 1.0f;
@@ -81,7 +90,36 @@ public:
 		animations.push_back(Animation(shape, solution, time));
 	}
 
+	bool isPaused() {
+		return paused;
+	}
+
+	void pause() {
+		paused = true;
+	}
+
+	void play() {
+		paused = false;
+	}
+
+	// input a decimal 0.0-1.0 to represet percentage
+	void scrub(float delta) {
+		for (int i = 0; i < animations.size(); i++) {
+			animations[i].progress += delta;
+		}
+	}
+
+	void incrementSpeed(float delta) {
+		speed += delta;
+	}
+
 private:
+	vector<Animation> animations;
+
+	// controls related stuff
+	bool paused;
+	float speed;
+
 	void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
 		// add face of node
 		list->push_back(root->data);

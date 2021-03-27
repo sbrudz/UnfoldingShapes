@@ -53,6 +53,9 @@ void mouse_button_callback_custom(GLFWwindow* window, int button, int action, in
 // control callback for moving the mouse
 void mouse_callback_custom(GLFWwindow* window, double xpos, double ypos);
 
+
+void updateControls(GLFWwindow* window, Animator &animator);
+
 // settings
 float relativeScreenSize = 0.85;
 
@@ -112,7 +115,9 @@ void setup() {
 	graphics->camera.pitch -= 22.5f;
 
 	// set text
-	graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+	graphics->addText("FPS: 0", "fps", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+	graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 63, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+
 
 	// set callbacks
 	//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
@@ -164,6 +169,9 @@ int main() {
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
 		// Main
+		// update controls
+		updateControls(graphics->window, animator);
+
 		animator.update();
 
 		// update player position
@@ -191,6 +199,9 @@ int main() {
 		if (fpsCount % int(fps) == 0) {
 			if (fpsCounterEnabled) {
 				std::cout << "\rFPS: " << fpsCounter / fpsCount;
+
+				// set text
+				graphics->setText("fps", "FPS: " + std::to_string(int(fpsCounter / fpsCount)));
 			}
 			fpsCount = 0;
 			fpsCounter = 0;
@@ -206,4 +217,48 @@ int main() {
 
 	std::cout << "Closing" << std::endl;
 	return gameState;
+}
+
+bool pressedEnter = false;
+
+void updateControls(GLFWwindow* window, Animator &animator) {
+	// pause or play (pressed Enter ensures that if the user holds the button then it won't try to play and pause over and over really fast)
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+		if (!pressedEnter) {
+			pressedEnter = true;
+
+			if (animator.isPaused()) {
+				animator.play();
+			}
+			else {
+				animator.pause();
+			}
+		}
+	}
+	else {
+		pressedEnter = false;
+	}
+
+	// increase speed
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		animator.incrementSpeed(0.01f);
+	}
+
+	// decrease speed
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		animator.incrementSpeed(-0.01f);
+	}
+
+	// scrubbing
+	// right - forward
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		animator.scrub(0.0025);
+		animator.pause();
+	}
+
+	// left - backward
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		animator.scrub(-0.0025);
+		animator.pause();
+	}
 }

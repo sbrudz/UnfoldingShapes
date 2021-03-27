@@ -186,12 +186,21 @@ public:
 	void rebuild() {
 		recompileNormals();
 
+		clearBuffers();
+
 		setupMesh();
 	}
 
 private:
 	//render data 
 	unsigned int VBO, EBO;
+
+	void clearBuffers() {
+		// clear data to preserve memory
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
+	}
 
 	//initializes all the buffer objects/arrays
 	void setupMesh()

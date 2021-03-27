@@ -54,13 +54,15 @@ public:
 
 	float sensitivity;
 
+	bool speedControlsEnabled;
+
 	// blank camera
 	Camera() {
 
 	}
 
 	// Main camera setup
-	Camera(const unsigned int* SCR_WIDTH, const unsigned int* SCR_HEIGHT, glm::vec3 startPos, bool pov) {
+	Camera(const unsigned int* SCR_WIDTH, const unsigned int* SCR_HEIGHT, glm::vec3 startPos, bool pov, bool speedControls = false) {
 		// set default variables
 		firstMouse = true;
 		yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
@@ -81,6 +83,7 @@ public:
 
 		sensitivity = 0.1f;
 
+		speedControlsEnabled = speedControls;
 
 		// make identity matrix
 		view = glm::mat4(1.0f);
@@ -210,24 +213,26 @@ public:
 		deceleration = 0.01 * speedMultiplier;
 
 		// speed controls
-		// up
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-			speedMultiplier *= speedIncrement;
-		}
-		// down
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-			speedMultiplier /= speedIncrement;
-		}
+		if (speedControlsEnabled) {
+			// up
+			if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+				speedMultiplier *= speedIncrement;
+			}
+			// down
+			if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+				speedMultiplier /= speedIncrement;
+			}
 
-		// mouse controls
-		// right
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-			senseMultiplier *= senseIncrement;
-		}
+			// mouse controls
+			// right
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+				senseMultiplier *= senseIncrement;
+			}
 
-		// left
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-			senseMultiplier /= senseIncrement;
+			// left
+			if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+				senseMultiplier /= senseIncrement;
+			}
 		}
 
 		// camera controls
