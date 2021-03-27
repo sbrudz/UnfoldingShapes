@@ -59,12 +59,12 @@ private:
 	}
 
 public:
-	static Graph<Face> basic(Shape* shape) {
+	static Graph<Face>* basic(Shape* shape) {
 		// init solution with the base 
 		// std::cout << shape->faceMap.rootNode << std::endl;
-		Graph<Face> solution = Graph<Face>(shape->faceMap.rootNode->data);
+		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
-		basicRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
+		basicRecusivePopulation(shape->faceMap.rootNode, solution, solution->rootNode);
 
 		// quick fix (remove the last element of the graph)
 

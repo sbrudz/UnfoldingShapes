@@ -111,6 +111,9 @@ void setup() {
 	graphics->camera.yaw += 45.0f;
 	graphics->camera.pitch -= 22.5f;
 
+	// set text
+	graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+
 	// set callbacks
 	//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
 	//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
@@ -118,8 +121,8 @@ void setup() {
 	// add assets
 	//shapes.push_back(new Shape(backpackModel));
 	//shapes.push_back(new Shape(humanoidModel));
-	shapes.push_back(new Shape(ballModel));
-	//shapes.push_back(new Shape(cubeModel));
+	//shapes.push_back(new Shape(ballModel));
+	shapes.push_back(new Shape(cubeModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
@@ -130,7 +133,7 @@ void setup() {
 	// unfold = Unfold::breadthUnfold(shapes[0]);
 	for (int i = 0; i < shapes.size(); i++) {
 		shapes[i]->unfolds.push_back(Unfold::basic(shapes[0]));
-		animator.addAnimation(shapes[i], &shapes[i]->unfolds[0], 15);
+		animator.addAnimation(shapes[i], shapes[i]->unfolds[0], 15);
 	}
 
 	// fps and game init
@@ -162,6 +165,9 @@ int main() {
 
 		// Main
 		animator.update();
+
+		// update player position
+		graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));
 
 		// render frame
 		gameState = graphics->renderFrame();

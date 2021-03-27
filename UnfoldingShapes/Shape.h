@@ -67,15 +67,15 @@ public:
 			for (int i = 0; i < appliedFaces.size(); i++) {
 				// rotate vertices
 				for (int j = 0; j < appliedFaces[i]->mesh->vertices.size(); j++) {
-					appliedFaces[i]->mesh->vertices[j].Position = appliedFaces[i]->mesh->backupVertices[j].Position;
+					//appliedFaces[i]->mesh->vertices[j].Position = appliedFaces[i]->mesh->backupVertices[j].Position;
 
-					//appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, -deltaAngle);
+					appliedFaces[i]->mesh->vertices[j].Position = axis.rotateAbout(appliedFaces[i]->mesh->vertices[j].Position, -deltaAngle);
 					//std::cout << glm::to_string(appliedFaces[i]->mesh->vertices[j].Position) << std::endl;
 				}
 
 				// rotate axis
 				for (int j = 0; j < appliedFaces[i]->axis.size(); j++) {
-					// appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, -deltaAngle);
+					appliedFaces[i]->axis[j]->rotateAxisAbout(&axis, -deltaAngle);
 					appliedFaces[i]->axis[j]->revert();
 				}
 			}
@@ -88,7 +88,7 @@ public:
 	vector<Face*> faces;
 	Graph<Face> faceMap;
 
-	vector<Graph<Face>> unfolds;
+	vector<Graph<Face>*> unfolds;
 
 	// stores the transformations applied to the shape so we can revert.
 	vector<Transformation> appliedTransformations;

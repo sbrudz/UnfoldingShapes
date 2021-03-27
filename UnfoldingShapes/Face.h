@@ -87,16 +87,17 @@ public:
 		// transform this axis based on another axis
 		void rotateAxisAbout(Axis* axis, float angle) {
 			//std::cout << "1 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
-			glm::vec3 point1 = line * -1.0f + point;
-			glm::vec3 point2 = line * 1.0f + point;
+			glm::vec3 point1 = line * -0.1f + point;
+			glm::vec3 point2 = line * 0.1f + point;
 
 			point1 = axis->rotateAbout(point1, angle);
 			point2 = axis->rotateAbout(point2, angle);
 
 			// normalize and get abs to standardize it
-			line = glm::abs(glm::normalize(point1 - point2));
+			line = glm::abs(glm::normalize(point2 - point1));
 
-			point = closestPointOnLine(line, point1, glm::vec3(0));
+			//point = closestPointOnLine(line, point1, glm::vec3(0));
+			point = axis->rotateAbout(point, angle);
 
 			//std::cout << "2 " << glm::to_string(line) << " " << glm::to_string(point) << std::endl;
 		}
@@ -149,7 +150,7 @@ public:
 		}
 
 		void print() {
-			std::cout << "Line: " << glm::to_string(line) << ", Point: " << glm::to_string(point) << ", Original Points: " << glm::to_string(p1) << " " << glm::to_string(p2) << std::endl;
+			std::cout << "Line: " << glm::to_string(line) << ", Point: " << glm::to_string(point) << ", Original Angle: " << originalAngle << ", Original Points: " << glm::to_string(p1) << " " << glm::to_string(p2) << std::endl;
 		}
 	};
 

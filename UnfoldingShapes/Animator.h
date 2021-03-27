@@ -56,11 +56,12 @@ public:
 				// first revert
 				animations[i].shape->revert();
 
-				breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
+				//breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
+				stepBasedUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
 				//recursiveUpdate(animations[i].solution->rootNode, &animations[i]);
 
 				//std::cout << animations[i].progress << std::endl;
-				animations[i].progress += 2.0f * 2.0f / (100 * animations[i].time);
+				animations[i].progress += 1.0f * 2.0f / (100 * animations[i].time);
 			}
 			else if (animations[i].progress > 1.0f) {
 				animations[i].progress = 1.0f;
@@ -91,25 +92,42 @@ private:
 		}
 	}
 
-	// Current working solution
-	void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+	void stepBasedUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+		float miniProgress = 1.0f / root->graph->size;
+
 		vector<Graph<Face>::Node*> queue;
 
 		queue.push_back(root);
 
 		Graph<Face>::Node* current;
 
-		while (!queue.empty()) {
-			current = queue[0];
-			queue.erase(queue.begin());
+		int index = 0;
+
+		while (queue.size() <= floor(progress / miniProgress)) {
+			current = queue[index];
+
+			//std::cout << "New Animation Frame:" << std::endl;
 
 			for (int i = 0; i < current->connections.size(); i++) {
-				// find axis
-				Face::Axis* axis = nullptr;
+				queue.push_back(current->connections[i]);
+			}
 
+			index += 1;
+		}
+
+		// catchup all the queue indicies less than current
+		for (int z = 0; z < queue.size() && z != floor(progress / miniProgress); z++) {
+			current = queue[z];
+
+			// find axis
+			Face::Axis* axis = nullptr;
+
+			for (int i = 0; i < current->connections.size(); i++) {
 				for (int x = 0; x < current->data->axis.size(); x++) {
 					if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
 						axis = current->data->axis[x];
+
+						//axis->print();
 
 						break;
 					}
@@ -118,11 +136,101 @@ private:
 				// apply to children
 				if (axis != nullptr) {
 					// use the method to add all child faces attatched to the current face for the transformation of the shape.
-					vector<Face*> appliedFaces;
+					vector<Face*> appliedFaces = vector<Face*>();
+					recursiveChildCompilation(&appliedFaces, current->connections[i]);
+
+					if (z == 1) {
+						shape->transform(-1 * (axis->originalAngle), axis, appliedFaces);
+					}
+					else {
+						shape->transform(1 * (axis->originalAngle), axis, appliedFaces);
+					}
+				}
+			}
+		}
+
+		// handle latest update
+		current = queue[floor(progress / miniProgress)];
+
+		// find axis
+		Face::Axis* axis = nullptr;
+
+		for (int i = 0; i < current->connections.size(); i++) {
+			for (int x = 0; x < current->data->axis.size(); x++) {
+				if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
+					axis = current->data->axis[x];
+
+					//axis->print();
+
+					break;
+				}
+			}
+
+			// apply to children
+			if (axis != nullptr) {
+				// use the method to add all child faces attatched to the current face for the transformation of the shape.
+				vector<Face*> appliedFaces = vector<Face*>();
+				recursiveChildCompilation(&appliedFaces, current->connections[i]);
+
+				if (floor(progress / miniProgress) == 1) {
+					shape->transform(-1 * (axis->originalAngle) * (fmod(progress, miniProgress) / miniProgress), axis, appliedFaces);
+				}
+				else {
+					shape->transform(1 * (axis->originalAngle) * (fmod(progress, miniProgress) / miniProgress), axis, appliedFaces);
+				}
+			}
+		}
+	}
+
+	// Current working solution
+	void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+		vector<Graph<Face>::Node*> queue;
+
+		queue.push_back(root);
+
+		Graph<Face>::Node* current;
+
+		int facesVisited = 0;
+
+		while (!queue.empty()) {
+			current = queue[0];
+			queue.erase(queue.begin());
+
+			//std::cout << "New Animation Frame:" << std::endl;
+
+			for (int i = 0; i < current->connections.size(); i++) {
+				facesVisited += 1;
+
+				// find axis
+				Face::Axis* axis = nullptr;
+
+				for (int x = 0; x < current->data->axis.size(); x++) {
+					if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
+						axis = current->data->axis[x];
+
+						//axis->print();
+
+						break;
+					}
+				}
+
+				// apply to children
+				if (axis != nullptr) {
+					// use the method to add all child faces attatched to the current face for the transformation of the shape.
+					vector<Face*> appliedFaces = vector<Face*>();
 					recursiveChildCompilation(&appliedFaces, current->connections[i]);
 
 					// apply to the shape
-					shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
+					if (facesVisited == 2) {
+						shape->transform(-1 * (axis->originalAngle) * progress, axis, appliedFaces);
+					}
+					else {
+						shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
+					}
+
+					if (facesVisited == 2) {
+						//axis->print();
+					}
 
 					queue.push_back(current->connections[i]);
 				}
