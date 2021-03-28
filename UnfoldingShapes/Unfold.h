@@ -33,28 +33,39 @@ private:
 		}
 	}
 
-	static void breadthRecusivePopulation(Graph<Face>::Node* mapNode, Graph<Face>* solution, Graph<Face>::Node* parent) {
-		bool flag = false;
+	static void breadthPopulation(Graph<Face>::Node* root, Graph<Face>* solution) {
+		vector<Graph<Face>::Node*> queue;
+		vector<Graph<Face>::Node*> visited;
 
-		for (int i = 0; i < mapNode->connections.size(); i++) {
-			if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
-				// set new parent
-				parent = solution->newNode(parent, mapNode->connections[i]->data);
+		queue.push_back(root);
+		visited.push_back(root);
 
-				flag = true;
+		Graph<Face>::Node* current;
+
+		while (!queue.empty()) {
+			current = queue[0];
+			queue.erase(queue.begin());
+
+			//std::cout << "New Animation Frame:" << std::endl;
+
+			Graph<Face>::Node* currentSolutionNode = solution->findNode(root, current->data);
+			for (int i = 0; i < current->connections.size(); i++) {
+				bool inList = false;
+
+				for (int x = 0; x < visited.size(); x++) {
+					if (visited[x] == current->connections[i]) {
+						inList = true;
+						break;
+					}
+				}
+
+				if (!inList) {
+					solution->newNode(currentSolutionNode, current->connections[i]->data);
+
+					visited.push_back(current->connections[i]);
+					queue.push_back(current->connections[i]);
+				}
 			}
-		}
-
-		if (flag) {
-			return;
-		}
-
-		for (int i = 0; i < mapNode->connections.size(); i++) {
-			Graph<Face>::Node* node = solution->findNode(solution->rootNode, mapNode->connections[i]->data);
-
-			//if (solution->findNode(solution->rootNode, mapNode->connections[i]->data) == nullptr) {
-				breadthRecusivePopulation(mapNode->connections[i], solution, node);
-			//}
 		}
 	}
 
@@ -71,17 +82,14 @@ public:
 		return solution;
 	}
 
-	static Graph<Face> breadthUnfold(Shape* shape) {
+	static Graph<Face>* breadthUnfold(Shape* shape) {
 		// init solution with the base 
 		// std::cout << shape->faceMap.rootNode << std::endl;
-		Graph<Face> solution = Graph<Face>(shape->faceMap.rootNode->data);
+		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
-		while (solution.size < shape->faceMap.size) {
-			std::cout << solution.size << " " << shape->faceMap.size << std::endl;
-			breadthRecusivePopulation(shape->faceMap.rootNode, &solution, solution.rootNode);
-		}
+		breadthPopulation(shape->faceMap.rootNode, solution);
 
-		std::cout << solution.size << std::endl;
+		std::cout << solution->size << std::endl;
 
 		return solution;
 	}

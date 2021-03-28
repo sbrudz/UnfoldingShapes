@@ -306,6 +306,7 @@ private:
 			consolidatedIndices[consolidatedIndices.size() - 1].push_back(indices[i + 2]);
 		}
 
+		// if two faces are tangent then combine them
 		for (int i = 0; i < consolidatedIndices.size(); i++) {
 			vector<int> toRemove;
 			for (int j = i+1; j < consolidatedIndices.size(); j++) {
@@ -428,7 +429,7 @@ private:
 			output.push_back(Mesh(consolidatedVertices, repairedIndices, textures, materials, samples));
 		}
 
-		// std::cout << "finished packing" << std::endl;
+		std::cout << "finished packing " << output.size() << " faces" << std::endl;
 
 		return output;
 	}
@@ -533,7 +534,7 @@ glm::vec4 getPlane(vector<Vertex> vert) {
 	float a = b1 * c2 - b2 * c1;
 	float b = a2 * c1 - a1 * c2;
 	float c = a1 * b2 - b1 * a2;
-	float d = (-a * vert[1].Position.x - b * vert[1].Position.y - c * vert[1].Position.z);
+	float d = (-a * vert[0].Position.x - b * vert[0].Position.y - c * vert[0].Position.z);
 
 	return glm::vec4(a, b, c, d);
 }
@@ -542,7 +543,12 @@ bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2) {
 	glm::vec4 plane1 = getPlane(vertices1);
 	glm::vec4 plane2 = getPlane(vertices2);
 
-	if (plane1 == plane2) {
+	plane1 = glm::vec4(glm::normalize(glm::vec3(plane1)), plane1.w);
+	plane2 = glm::vec4(glm::normalize(glm::vec3(plane2)), plane2.w);
+
+	//std::cout << glm::distance(plane1, plane2) << std::endl;
+	if (glm::distance(plane1, plane2) <= 1.0f) {
+		//std::cout << "here" << std::endl;
 		return true;
 	}
 

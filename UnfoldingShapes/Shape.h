@@ -225,8 +225,14 @@ private:
 		}
 		*/
 		
-		// Largest face is the base
+		// Largest face is the base (starting with the face furthest downward)
 		Face* largest = faces[0];
+
+		for (int i = 1; i < faces.size(); i++) {
+			if (faces[i]->mesh->avgPos.y < largest->mesh->avgPos.y) {
+				largest = faces[i];
+			}
+		}
 
 		for (int i = 1; i < faces.size(); i++) {
 			if (faces[i]->getArea() > largest->getArea()) {

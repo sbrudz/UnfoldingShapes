@@ -108,7 +108,7 @@ public:
 
 			float result = glm::orientedAngle(p1, p2, line);
 
-			// std::cout << result << std::endl;
+			result = (result/(sqrt(result*result)))*3.1415926535 - result;
 
 			return result;
 		}

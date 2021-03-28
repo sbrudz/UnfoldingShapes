@@ -31,6 +31,7 @@ using namespace std;
 GraphicsEngine* graphics;
 
 const char* cubeModel = "resources\\objects\\cube\\cube.obj";
+const char* dodecahedronModel = "resources\\objects\\dodecahedron\\dodecahedron.obj";
 const char* ballModel = "resources\\objects\\redball\\redball.obj";
 const char* boardModel = "resources\\objects\\3dmill\\3dmill.obj";
 const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
@@ -59,7 +60,7 @@ void updateControls(GLFWwindow* window, Animator &animator);
 // settings
 float relativeScreenSize = 0.85;
 
-float aspectRatio = 16 / 9;
+float aspectRatio = 16.0f / 9.0f;
 
 // default
 unsigned int SCR_WIDTH = 1600 * relativeScreenSize;
@@ -127,7 +128,8 @@ void setup() {
 	//shapes.push_back(new Shape(backpackModel));
 	//shapes.push_back(new Shape(humanoidModel));
 	//shapes.push_back(new Shape(ballModel));
-	shapes.push_back(new Shape(cubeModel));
+	//shapes.push_back(new Shape(cubeModel));
+	shapes.push_back(new Shape(dodecahedronModel));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
@@ -138,6 +140,8 @@ void setup() {
 	// unfold = Unfold::breadthUnfold(shapes[0]);
 	for (int i = 0; i < shapes.size(); i++) {
 		shapes[i]->unfolds.push_back(Unfold::basic(shapes[0]));
+		//shapes[i]->unfolds.push_back(Unfold::breadthUnfold(shapes[0]));
+
 		animator.addAnimation(shapes[i], shapes[i]->unfolds[0], 15);
 	}
 
