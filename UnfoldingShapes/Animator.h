@@ -44,7 +44,7 @@ public:
 	};
 
 	Animator() {
-		activeAlgorithm = 0;
+		activeAlgorithm = 1;
 		paused = false;
 		speed = 2.0f;
 
@@ -52,7 +52,9 @@ public:
 	}
 
 	// main update function for all animations
-	void update() {
+	void update(GraphicsEngine* graphics) {
+		this->graphics = graphics;
+
 		for (int i = 0; i < animations.size(); i++) {
 			if (animations[i].progress < 0.0f) {
 				// first revert
@@ -135,6 +137,8 @@ private:
 	bool paused;
 	float speed;
 
+	GraphicsEngine* graphics;
+
 	// which of the available algortihms is being used
 	int activeAlgorithm;
 
@@ -195,12 +199,7 @@ private:
 					vector<Face*> appliedFaces = vector<Face*>();
 					recursiveChildCompilation(&appliedFaces, current->connections[i]);
 
-					if (z == 1) {
-						shape->transform(-1 * (axis->originalAngle), axis, appliedFaces);
-					}
-					else {
-						shape->transform(1 * (axis->originalAngle), axis, appliedFaces);
-					}
+					shape->transform(1 * (axis->originalAngle), axis, appliedFaces);
 				}
 			}
 		}
@@ -228,12 +227,7 @@ private:
 				vector<Face*> appliedFaces = vector<Face*>();
 				recursiveChildCompilation(&appliedFaces, current->connections[i]);
 
-				if (floor(progress / miniProgress) == 1) {
-					shape->transform(-1 * (axis->originalAngle) * (fmod(progress, miniProgress) / miniProgress), axis, appliedFaces);
-				}
-				else {
-					shape->transform(1 * (axis->originalAngle) * (fmod(progress, miniProgress) / miniProgress), axis, appliedFaces);
-				}
+				shape->transform(1 * (axis->originalAngle) * (fmod(progress, miniProgress) / miniProgress), axis, appliedFaces);
 			}
 		}
 	}
@@ -246,6 +240,7 @@ private:
 
 		Graph<Face>::Node* current;
 
+		// debugging tool to identify axis
 		int facesVisited = 0;
 
 		while (!queue.empty()) {
@@ -277,16 +272,7 @@ private:
 					recursiveChildCompilation(&appliedFaces, current->connections[i]);
 
 					// apply to the shape
-					if (facesVisited == 2) {
-						shape->transform(-1 * (axis->originalAngle) * progress, axis, appliedFaces);
-					}
-					else {
-						shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
-					}
-
-					if (facesVisited == 2) {
-						//axis->print();
-					}
+					shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
 
 					queue.push_back(current->connections[i]);
 				}

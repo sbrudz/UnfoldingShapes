@@ -172,7 +172,7 @@ int main() {
 		// update controls
 		updateControls(graphics->window, animator);
 
-		animator.update();
+		animator.update(graphics);
 
 		// update player position
 		graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));

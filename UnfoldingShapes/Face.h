@@ -56,8 +56,8 @@ public:
 			this->p1 = p1;
 			this->p2 = p2;
 
-			// normalize and get abs to standardize it
-			originalLine = glm::abs(glm::normalize(p1 - p2));
+			// normalize to standardize it
+			originalLine = glm::normalize(p1 - p2);
 
 			originalPoint = closestPointOnLine(originalLine, p1, glm::vec3(0));
 
@@ -93,8 +93,8 @@ public:
 			point1 = axis->rotateAbout(point1, angle);
 			point2 = axis->rotateAbout(point2, angle);
 
-			// normalize and get abs to standardize it
-			line = glm::abs(glm::normalize(point2 - point1));
+			// normalize to standardize it
+			line = glm::normalize(point2 - point1);
 
 			//point = closestPointOnLine(line, point1, glm::vec3(0));
 			point = axis->rotateAbout(point, angle);
@@ -129,7 +129,7 @@ public:
 		}
 
 		bool operator==(Axis a) {
-			if (hasPoint(a.point) && glm::distance(line, a.line) < marginOfError)
+			if (hasPoint(a.point) && glm::distance(point, a.point) < marginOfError)
 			{
 				return true;
 			}
