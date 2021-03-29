@@ -93,7 +93,7 @@ public:
 
 	// takes in window display name, screen width, screen height, and number of samples per frame (1 is no multisampling). The last is if you want to have custom or preset control callbacks.
 	// MULTISAMPLING TEXTURES DOES NOT WORK. MAKE SURE TO SET SAMPLES TO 1.
-	GraphicsEngine(const char* windowName, const unsigned int *scr_WIDTH, const unsigned int *scr_HEIGHT, int samples, bool customCallback = false) {
+	GraphicsEngine(const char* windowName, const unsigned int *scr_WIDTH, const unsigned int *scr_HEIGHT, int samples = 1, bool customCallback = false) {
 
 		this->samples = samples;
 
@@ -235,9 +235,15 @@ public:
 		return NULL;
 	}
 
+	// creates a model and adds it to the model list
 	void addModel(string const &path) {
 		std::cout << "Added model at location: " << path << std::endl;
 		models.push_back(new Model(path, samples));
+	}
+
+	// create and return a model with the parameters from the rendering engine
+	Model* createModel(string const &path) {
+		return new Model(path, samples);
 	}
 
 	// asset stuff
@@ -301,10 +307,12 @@ public:
 		light.render(camera.projection, camera.update());
 
 		// testing stuff
-		// generateTestCube();
+		/*
+		generateTestCube();
 		for (int i = 0; i < 10; i++) {
-			// drawTestCube();
+			drawTestCube();
 		}
+		*/
 		
 		// model rendering
 		shader.use();

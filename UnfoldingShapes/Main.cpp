@@ -37,6 +37,9 @@ const char* boardModel = "resources\\objects\\3dmill\\3dmill.obj";
 const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
 const char* humanoidModel = "resources\\objects\\simplehumanoid\\simplehumanoid.obj";
 
+// legacy
+const char* fourModel = "resources\\objects\\3dfourconnect\\3dfourconnectFIXED.obj";
+
 // skybox paths
 const std::vector<const char*> cloudySkybox
 {
@@ -61,6 +64,8 @@ void updateControls(GLFWwindow* window, Animator &animator);
 float relativeScreenSize = 0.85;
 
 float aspectRatio = 16.0f / 9.0f;
+
+int samples = 4;
 
 // default
 unsigned int SCR_WIDTH = 1600 * relativeScreenSize;
@@ -98,7 +103,7 @@ void setup() {
 	}
 
 	// make the graphics engine (Jordan: Do not focus too much on this, it is very complicated and not relevant to the problem.
-	graphics = new GraphicsEngine("3D Mill", &SCR_WIDTH, &SCR_HEIGHT, 1);
+	graphics = new GraphicsEngine("3D Mill", &SCR_WIDTH, &SCR_HEIGHT, samples);
 
 	// add all the models that are going to be used immediatley
 
@@ -129,7 +134,7 @@ void setup() {
 	//shapes.push_back(new Shape(humanoidModel));
 	//shapes.push_back(new Shape(ballModel));
 	//shapes.push_back(new Shape(cubeModel));
-	shapes.push_back(new Shape(dodecahedronModel));
+	shapes.push_back(new Shape(dodecahedronModel, graphics));
 
 	for (int i = 0; i < shapes.size(); i++) {
 		graphics->addAsset(shapes[i]->asset);
