@@ -7,75 +7,42 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Unfold">
-      <UniqueIdentifier>{1eeae276-e4b7-435a-b738-aa410e2e5c27}</UniqueIdentifier>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
     </Filter>
-    <Filter Include="Source Files\Graphics">
-      <UniqueIdentifier>{a7424875-6f5a-4e41-ac80-30e5ac947c71}</UniqueIdentifier>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <QtRcc Include="UnfoldingShapes.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <QtUic Include="UnfoldingShapes.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtMoc Include="UnfoldingShapes.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClCompile Include="UnfoldingShapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LibResources\include\img\ImageLoader.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Asset.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsEngine.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Quad.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="TextManager.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Shape.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
-    <ClInclude Include="UnfoldSolution.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
-    <ClInclude Include="Face.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
-    <ClInclude Include="Graph.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
-    <ClInclude Include="Unfold.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
-    <ClInclude Include="Animator.h">
-      <Filter>Source Files\Unfold</Filter>
-    </ClInclude>
+    <ResourceCompile Include="$pro_name$.rc">
+    </ResourceCompile>
+    <None Include="$pro_name$.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="$pro_name$.def">
+      <Filter>Resource Files</Filter>
+    </None>
+
   </ItemGroup>
 </Project>
