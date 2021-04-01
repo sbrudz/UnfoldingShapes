@@ -169,7 +169,7 @@ void setup() {
 	*/
 }
 
-int main() {
+int OldMain() {
 	setup();
 
 	// run
