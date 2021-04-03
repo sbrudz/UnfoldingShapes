@@ -100,7 +100,6 @@
     <QtMoc Include="UnfoldingShapes.h" />
     <ClCompile Include="..\LibResources\include\img\ImageLoader.cpp" />
     <ClCompile Include="glad.c" />
-    <ClCompile Include="Old Main.cpp" />
     <ClCompile Include="UnfoldingShapes.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -114,7 +113,9 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="OpenGLWidget.h" />
     <ClInclude Include="Quad.h" />
+    <ClInclude Include="Runner.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="TextManager.h" />

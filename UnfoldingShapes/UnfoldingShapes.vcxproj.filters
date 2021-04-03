@@ -52,9 +52,6 @@
     <ClCompile Include="..\LibResources\include\img\ImageLoader.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Old Main.cpp">
-      <Filter>Source Files\Unfold</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset.h">
@@ -101,6 +98,12 @@
     </ClInclude>
     <ClInclude Include="UnfoldSolution.h">
       <Filter>Source Files\Unfold</Filter>
+    </ClInclude>
+    <ClInclude Include="Runner.h">
+      <Filter>Source Files\Unfold</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWidget.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
