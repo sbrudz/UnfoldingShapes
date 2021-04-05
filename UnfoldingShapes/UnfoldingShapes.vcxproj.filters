@@ -38,16 +38,10 @@
     <QtMoc Include="UnfoldingShapes.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="UnfoldingShapes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\LibResources\include\img\ImageLoader.cpp">
       <Filter>Source Files\Graphics</Filter>

@@ -1,11 +1,8 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <img/stb_image.h>
-//idk but manually importing fixes the problem
-//#include <img/ImageLoader.h>
+#include <qopenglwidget.h>
+#include <qopenglfunctions_3_3_core.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -26,6 +23,8 @@
 //must have valid shader to be enabled
 class Light {
 public:
+	QOpenGLFunctions_3_3_Core *f;
+
 	//the difference is that enabled is only true if the light's component settings are valid which include position and that is used for calculations by other shaders
 	//visible means that all mathematical components are set but you can change whether or not you want it to render
 	//enabled
@@ -52,7 +51,9 @@ public:
 	}
 
 	//remember to set pos and enable the light
-	Light(const char* vs, const char* fs) {
+	Light(QOpenGLFunctions_3_3_Core *f, const char* vs, const char* fs) {
+		this->f = f;
+
 		this->pos = glm::vec3(10);
 		this->color = glm::vec3(1,1,1);
 
@@ -65,7 +66,9 @@ public:
 		visible = true;
 	}
 
-	Light(const char* vs, const char* fs, glm::vec3 pos, glm::vec3 color) {
+	Light(QOpenGLFunctions_3_3_Core *f, const char* vs, const char* fs, glm::vec3 pos, glm::vec3 color) {
+		this->f = f;
+
 		this->pos = pos;
 		this->color = color;
 
@@ -81,7 +84,7 @@ public:
 	//include shader files and automatically enables the light for drawing
 	void setup(const char* vs, const char* fs) {
 
-		shader = Shader(vs, fs);
+		shader = Shader(f, vs, fs);
 
 		float cube[] = {
 			//back
@@ -137,20 +140,22 @@ public:
 		//float vertices[138240];
 
 		//make the light cube
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glBindVertexArray(VAO);
+		f->glGenVertexArrays(1, &VAO);
+		f->glGenBuffers(1, &VBO);
+		f->glBindVertexArray(VAO);
 
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+		f->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		f->glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+		f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		f->glEnableVertexAttribArray(0);
 
 		enabled = true;
 	}
 
 	void render(glm::mat4 proj, glm::mat4 view) {
+		QOpenGLFunctions_3_3_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+
 		if (enabled && visible) {
 			//draw light source
 			shader.use();
@@ -161,9 +166,9 @@ public:
 			lightModel = glm::scale(lightModel, glm::vec3(1)); //change cube size
 			shader.setMat4("model", lightModel);
 
-			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
+			f->glBindVertexArray(VAO);
+			f->glDrawArrays(GL_TRIANGLES, 0, 36);
+			f->glBindVertexArray(0);
 		}
 	}
 };

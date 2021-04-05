@@ -16,11 +16,6 @@
 
 #include "Camera.h"
 
-#include "MinecraftManager.h"
-#include "BlockType.h"
-#include "Block.h"
-#include "Surface.h"
-
 #include <vector>
 
 #include <string>

@@ -3,16 +3,15 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/qopenglwidget.h>
 
-#include "Runner.h"
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    UnfoldingShapes w;
-    w.show();
+    //UnfoldingShapes w;
 
-	//OpenGLWidget opengl;
-	//opengl.show();
+	OpenGLWidget opengl;
+	//w.setOpenGLWidget(new OpenGLWidget());
+	opengl.show();
+	//w.show();
 
     return a.exec();
 }

@@ -2,9 +2,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -85,6 +82,7 @@ public:
 
 		speedControlsEnabled = speedControls;
 
+		
 		// make identity matrix
 		view = glm::mat4(1.0f);
 		projection = glm::mat4(1.0f);
@@ -168,7 +166,7 @@ public:
 	}
 
 	// control rotation with mouse through GLFW window
-	void mouseInputPOV(GLFWwindow* window, double xpos, double ypos) {
+	void mouseInputPOV(double xpos, double ypos) {
 		if (firstMouse)
 		{
 			lastX = xpos;
@@ -206,6 +204,7 @@ public:
 
 	// default input control
 	// process all input: ask GLFW whether relevant keys are pressed/released this frame and react accordingly
+	/*
 	void processInput(GLFWwindow *window)
 	{
 
@@ -264,6 +263,7 @@ public:
 
 		updatePhysics();
 	}
+	*/
 };
 
 #endif

@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <qopenglwidget.h>
+#include <qopenglfunctions_3_3_core.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,6 +29,8 @@ struct Character {
 //text manager class
 class TextManager {
 public:
+	QOpenGLFunctions_3_3_Core *f;
+
 	int SCR_WIDTH;
 	int SCR_HEIGHT;
 
@@ -60,15 +62,17 @@ public:
 
 	}
 
-	TextManager(const unsigned int &SCR_WIDTH, const unsigned int &SCR_HEIGHT) {
+	TextManager(QOpenGLFunctions_3_3_Core *f, const unsigned int &SCR_WIDTH, const unsigned int &SCR_HEIGHT) {
+		this->f = f;
+
 		this->SCR_WIDTH = SCR_WIDTH;
 		this->SCR_HEIGHT = SCR_HEIGHT;
 
 		//setup projection and camera angle for render of characters
-		shader = Shader("resources/shaders/text.vs", "resources/shaders/text.fs");
+		shader = Shader(f, "resources/shaders/text.vs", "resources/shaders/text.fs");
 		projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
 		shader.use();
-		glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		f->glUniformMatrix4fv(f->glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 		// FreeType
 		// --------
@@ -148,15 +152,15 @@ public:
 
 		// configure VAO/VBO for texture quads
 		// -----------------------------------
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+		f->glGenVertexArrays(1, &VAO);
+		f->glGenBuffers(1, &VBO);
+		f->glBindVertexArray(VAO);
+		f->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		f->glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+		f->glEnableVertexAttribArray(0);
+		f->glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		f->glBindBuffer(GL_ARRAY_BUFFER, 0);
+		f->glBindVertexArray(0);
 	}
 
 	//render the text each frame
@@ -221,9 +225,10 @@ private:
 
 		// activate corresponding render state	
 		shader.use();
-		glUniform3f(glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z);
-		glActiveTexture(GL_TEXTURE0);
-		glBindVertexArray(VAO);
+
+		f->glUniform3f(f->glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z);
+		f->glActiveTexture(GL_TEXTURE0);
+		f->glBindVertexArray(VAO);
 
 		// iterate through all characters
 		std::string::const_iterator c;
@@ -247,19 +252,19 @@ private:
 				{ xpos + w, ypos + h,   1.0f, 0.0f }
 			};
 			// render glyph texture over quad
-			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+			f->glBindTexture(GL_TEXTURE_2D, ch.TextureID);
 			// update content of VBO memory
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
+			f->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			f->glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
 
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			f->glBindBuffer(GL_ARRAY_BUFFER, 0);
 			// render quad
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			f->glDrawArrays(GL_TRIANGLES, 0, 6);
 			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 			x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
 		}
-		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		f->glBindVertexArray(0);
+		f->glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 };

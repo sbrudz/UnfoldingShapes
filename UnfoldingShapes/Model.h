@@ -1,11 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+//#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
 
-#include "img/ImageLoader.h"
-#include "img/stb_image.h"
+//#include "img/ImageLoader.h"
+//#include "img/stb_image.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -465,6 +465,7 @@ private:
 	}
 };
 
+/*
 //method from stb_image.h
 unsigned int TextureFromFile(const char *path, const string &directory, int samples, bool gamma)
 {
@@ -523,6 +524,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, int samp
 
 	return textureID;
 };
+*/
 
 // utility
 glm::vec4 getPlane(vector<Vertex> vert) {

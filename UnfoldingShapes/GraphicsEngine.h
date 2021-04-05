@@ -1,8 +1,8 @@
 #ifndef GRAPHICSENGINE_H
 #define GRAPHICSENGINE_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+//#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
 #include <img/stb_image.h>
 // idk but manually importing fixes the problem
 // #include <img/ImageLoader.h>
