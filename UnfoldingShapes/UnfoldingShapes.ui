@@ -14,7 +14,7 @@
    <string>UnfoldingShapes</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QOpenGLWidget" name="openGLWidget">
+   <widget class="OpenGLWidget" name="openGLWidget">
     <property name="geometry">
      <rect>
       <x>200</x>

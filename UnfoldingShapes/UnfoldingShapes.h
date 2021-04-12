@@ -14,10 +14,6 @@ public:
 		ui.setupUi(this);
 	}
 
-	void setOpenGLWidget(QOpenGLWidget* w) {
-		ui.openGLWidget = w;
-	}
-
 private:
     Ui::UnfoldingShapesClass ui;
 };

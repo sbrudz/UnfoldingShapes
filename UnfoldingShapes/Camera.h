@@ -15,8 +15,8 @@
 class Camera {
 public:
 	// screen sizes
-	const unsigned int *SCR_WIDTH;
-	const unsigned int *SCR_HEIGHT;
+	int SCR_WIDTH;
+	int SCR_HEIGHT;
 
 	// camera calc values
 	glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -59,7 +59,7 @@ public:
 	}
 
 	// Main camera setup
-	Camera(const unsigned int* SCR_WIDTH, const unsigned int* SCR_HEIGHT, glm::vec3 startPos, bool pov, bool speedControls = false) {
+	Camera(int SCR_WIDTH, int SCR_HEIGHT, glm::vec3 startPos, bool pov, bool speedControls = false) {
 		// set default variables
 		firstMouse = true;
 		yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
@@ -92,7 +92,7 @@ public:
 		this->SCR_HEIGHT = SCR_HEIGHT;
 
 		// set camera type and variables
-		projection = glm::perspective(glm::radians(fov), (float)*SCR_WIDTH / (float)*SCR_HEIGHT, nearPlane, farPlane);
+		projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, nearPlane, farPlane);
 
 		// set position and rotation
 		pos = startPos;

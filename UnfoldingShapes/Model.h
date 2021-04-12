@@ -27,7 +27,7 @@
 inline unsigned int TextureFromFile(const char *path, const string &directory, int samples = 1, bool gamma = false);
 
 // prototypes
-bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
+//bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
 
 //Do not reinitialize the model
 class Model {
@@ -463,6 +463,38 @@ private:
 		}
 		return textures;
 	}
+
+	// utility
+	glm::vec4 getPlane(vector<Vertex> vert) {
+		float a1 = vert[1].Position.x - vert[0].Position.x;
+		float b1 = vert[1].Position.y - vert[0].Position.y;
+		float c1 = vert[1].Position.z - vert[0].Position.z;
+		float a2 = vert[2].Position.x - vert[0].Position.x;
+		float b2 = vert[2].Position.y - vert[0].Position.y;
+		float c2 = vert[2].Position.z - vert[0].Position.z;
+		float a = b1 * c2 - b2 * c1;
+		float b = a2 * c1 - a1 * c2;
+		float c = a1 * b2 - b1 * a2;
+		float d = (-a * vert[0].Position.x - b * vert[0].Position.y - c * vert[0].Position.z);
+
+		return glm::vec4(a, b, c, d);
+	}
+
+	bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2) {
+		glm::vec4 plane1 = getPlane(vertices1);
+		glm::vec4 plane2 = getPlane(vertices2);
+
+		plane1 = glm::vec4(glm::normalize(glm::vec3(plane1)), plane1.w);
+		plane2 = glm::vec4(glm::normalize(glm::vec3(plane2)), plane2.w);
+
+		//std::cout << glm::distance(plane1, plane2) << std::endl;
+		if (glm::distance(plane1, plane2) <= 1.0f) {
+			//std::cout << "here" << std::endl;
+			return true;
+		}
+
+		return false;
+	}
 };
 
 /*
@@ -525,37 +557,5 @@ unsigned int TextureFromFile(const char *path, const string &directory, int samp
 	return textureID;
 };
 */
-
-// utility
-glm::vec4 getPlane(vector<Vertex> vert) {
-	float a1 = vert[1].Position.x - vert[0].Position.x;
-	float b1 = vert[1].Position.y - vert[0].Position.y;
-	float c1 = vert[1].Position.z - vert[0].Position.z;
-	float a2 = vert[2].Position.x - vert[0].Position.x;
-	float b2 = vert[2].Position.y - vert[0].Position.y;
-	float c2 = vert[2].Position.z - vert[0].Position.z;
-	float a = b1 * c2 - b2 * c1;
-	float b = a2 * c1 - a1 * c2;
-	float c = a1 * b2 - b1 * a2;
-	float d = (-a * vert[0].Position.x - b * vert[0].Position.y - c * vert[0].Position.z);
-
-	return glm::vec4(a, b, c, d);
-}
-
-bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2) {
-	glm::vec4 plane1 = getPlane(vertices1);
-	glm::vec4 plane2 = getPlane(vertices2);
-
-	plane1 = glm::vec4(glm::normalize(glm::vec3(plane1)), plane1.w);
-	plane2 = glm::vec4(glm::normalize(glm::vec3(plane2)), plane2.w);
-
-	//std::cout << glm::distance(plane1, plane2) << std::endl;
-	if (glm::distance(plane1, plane2) <= 1.0f) {
-		//std::cout << "here" << std::endl;
-		return true;
-	}
-
-	return false;
-}
 
 #endif

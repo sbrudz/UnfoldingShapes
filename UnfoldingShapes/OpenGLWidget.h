@@ -23,22 +23,16 @@
 #include "Model.h"
 #include "Mesh.h"
 
-// tools
-// mouse state, POV for point of view camera and controls, MOUSE for normal mouse movement detection and no camera effect.
-enum MouseControlState { POV, MOUSE, CUSTOM };
-
-// Pointer tools
-// Window Clamp Mouse
-bool *clampMousePointer;
-MouseControlState *mouseModePointer;
-
-Camera *cameraPointer;
-
-// add all models before you start making assets
-// a simple graphicsengine (uses multisampling x4)
-
 class OpenGLWidget : public QOpenGLWidget {
 public:
+	// tools
+	// mouse state, POV for point of view camera and controls, MOUSE for normal mouse movement detection and no camera effect.
+	enum MouseControlState { POV, MOUSE, CUSTOM };
+
+	// add all models before you start making assets
+	// a simple graphicsengine (uses multisampling x4)
+
+	// start of class code
 	QOpenGLFunctions_3_3_Core *f;
 
 	Camera camera;
@@ -51,9 +45,6 @@ public:
 
 	// samples for multisampling
 	int samples;
-
-	const unsigned int *SCR_WIDTH;
-	const unsigned int *SCR_HEIGHT;
 
 	// list of active models
 	std::vector<Model*> models;
@@ -82,7 +73,7 @@ public:
 	}
 
 	void setup() {
-		
+		samples = 1;
 	}
 
 	void initFormat() {
@@ -93,25 +84,20 @@ public:
 		setFormat(format);
 	}
 
-	
 	void initializeGL() override {
 		f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
 		
 		// configure global opengl state
 		f->glEnable(GL_DEPTH_TEST);
 
-		clampMousePointer = &clampMouse;
-		mouseModePointer = &mouseMode;
-
 		// Camera
-		camera = Camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0), true);
-		cameraPointer = &camera;
+		camera = Camera(width(), height(), glm::vec3(0), true);
 
 		// for textures
 		// stbi_set_flip_vertically_on_load(true);
 
 		// mouse control State default
-		// setMouseMode(MouseControlState::POV);
+		setMouseMode(MouseControlState::POV);
 
 		// light setup
 		light = Light(f, "resources/shaders/light.vs", "resources/shaders/light.fs");
@@ -140,8 +126,6 @@ public:
 		f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		drawTestCube(glm::vec3(0,0,4));
-
-
 		
 		// model rendering
 		shader.use();

@@ -1,6 +1,9 @@
 #ifndef RUNNER_H
 #define RUNNER_H
 
+#include <qobject.h>
+#include <qtimer.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,19 +22,16 @@
 #include "Asset.h"
 #include "Model.h"
 #include "Mesh.h"
-#include "Skybox.h"
-#include "TextManager.h"
-#include "GraphicsEngine.h"
 
 // Unfold tools
 #include "Shape.h"
 #include "UnfoldSolution.h"
 #include "Unfold.h"
-#include "Animator.h"
+//#include "Animator.h"
 
 using namespace std;
 
-class Runner {
+class Runner : public QObject {
 public:
 	// resources
 	const char* cubeModel = "resources\\objects\\cube\\cube.obj";
@@ -57,11 +57,11 @@ public:
 
 	// prototypes
 	// control callback for clicking the mouse
-	void mouse_button_callback_custom(GLFWwindow* window, int button, int action, int mods);
+	//void mouse_button_callback_custom(GLFWwindow* window, int button, int action, int mods);
 	// control callback for moving the mouse
-	void mouse_callback_custom(GLFWwindow* window, double xpos, double ypos);
+	//void mouse_callback_custom(GLFWwindow* window, double xpos, double ypos);
 
-	void updateControls(GLFWwindow* window, Animator &animator);
+	//void updateControls(GLFWwindow* window, Animator &animator);
 
 	// settings
 	float relativeScreenSize = 0.85;
@@ -84,36 +84,25 @@ public:
 	// game
 	int gameState;
 
-	GraphicsEngine* graphics;
+	//GraphicsEngine* graphics;
 
 	vector<Shape*> shapes;
 
-	Animator animator;
+	//Animator animator;
 
-	Runner() {
+	QTimer *timer;
+
+	Runner(QObject* parent = nullptr) : QObject(parent) {
 		setup();
 	}
 
 	void setup() {
-		// set window size to max while also maintaining size ratio
-		RECT rect;
-		GetClientRect(GetDesktopWindow(), &rect);
+		// set timer for each frame to update
+		timer = new QTimer(this);
+		connect(timer, &QTimer::timeout, this, &frame);
+		timer->start(1000);
 
-		SCR_WIDTH = (rect.right - rect.left) * relativeScreenSize;
-		SCR_HEIGHT = (rect.bottom - rect.top) * relativeScreenSize;
-
-		if (SCR_WIDTH / SCR_HEIGHT < aspectRatio) {
-			// base the size off the width
-			SCR_HEIGHT = SCR_WIDTH * (1 / aspectRatio);
-		}
-		if (SCR_HEIGHT / SCR_WIDTH > aspectRatio) {
-			// base the size off the height
-			SCR_WIDTH = SCR_HEIGHT * (aspectRatio);
-		}
-
-		// make the graphics engine (Jordan: Do not focus too much on this, it is very complicated and not relevant to the problem.
-		graphics = new GraphicsEngine("3D Mill", &SCR_WIDTH, &SCR_HEIGHT, samples);
-
+		/*
 		// add all the models that are going to be used immediatley
 
 		// set skybox
@@ -143,7 +132,7 @@ public:
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
 		//shapes.push_back(new Shape(cubeModel));
-		shapes.push_back(new Shape(dodecahedronModel, graphics));
+		//shapes.push_back(new Shape(dodecahedronModel, graphics));
 
 		for (int i = 0; i < shapes.size(); i++) {
 			graphics->addAsset(shapes[i]->asset);
@@ -164,10 +153,13 @@ public:
 		fpsCounter = 0;
 
 		gameState = 1;
+		*/
 	}
 
 	void frame() {
+		std::cout << "here" << std::endl;
 		// START timer
+		/*
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
 		// Main
@@ -215,6 +207,7 @@ public:
 
 		// std::cout << sleepDuration << std::endl;
 		Sleep(sleepDuration);
+		*/
 	}
 
 	// utility functions
@@ -222,6 +215,7 @@ public:
 	bool pressedEnter = false;
 	bool pressedTab = false;
 
+	/*
 	void updateControls(GLFWwindow* window, Animator &animator) {
 		// pause or play (pressed Enter ensures that if the user holds the button then it won't try to play and pause over and over really fast)
 		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
@@ -275,5 +269,6 @@ public:
 			pressedTab = false;
 		}
 	}
+	*/
 };
 #endif

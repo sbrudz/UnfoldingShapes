@@ -16,12 +16,11 @@
 #include "Asset.h"
 #include "Model.h"
 #include "Mesh.h"
-#include "Skybox.h"
-#include "TextManager.h"
-#include "GraphicsEngine.h"
 
 #include "Face.h"
 #include "Graph.h"
+
+#include "OpenGLWidget.h"
 
 class Shape {
 public:
@@ -100,7 +99,7 @@ public:
 
 	// init Shape by setting the asset and registering all of the faces.
 	// Copies the model because we are manipulating the face and vertex info.
-	Shape(string const &path, GraphicsEngine* graphics, glm::vec3 pos = glm::vec3(0), glm::vec3 rot = glm::vec3(0), glm::vec3 scale = glm::vec3(1)) {
+	Shape(string const &path, OpenGLWidget* graphics, glm::vec3 pos = glm::vec3(0), glm::vec3 rot = glm::vec3(0), glm::vec3 scale = glm::vec3(1)) {
 		this->model = new Model(path, graphics->samples);
 		asset = new Asset(this->model, pos, rot, scale);
 

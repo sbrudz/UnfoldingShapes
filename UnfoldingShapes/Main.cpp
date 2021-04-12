@@ -2,6 +2,7 @@
 #include "OpenGLWidget.h"
 #include <QtWidgets/QApplication>
 #include <QtWidgets/qopenglwidget.h>
+#include "Runner.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,9 +11,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     UnfoldingShapes w;
 
-	OpenGLWidget opengl;
-	w.setOpenGLWidget(new OpenGLWidget());
-	opengl.show();
+	Runner runner;
+
+	//OpenGLWidget opengl;
+	//opengl.show();
 	w.show();
 
 	std::cout << "finished init" << std::endl;

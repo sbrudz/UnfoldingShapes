@@ -15,9 +15,6 @@
 #include "Asset.h"
 #include "Model.h"
 #include "Mesh.h"
-#include "Skybox.h"
-#include "TextManager.h"
-#include "GraphicsEngine.h"
 
 #include "Face.h"
 #include "Graph.h"
