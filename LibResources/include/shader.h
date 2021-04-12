@@ -110,6 +110,8 @@ public:
 		if (geometryPath != nullptr)
 			f->glDeleteShader(geometry);
 
+		use();
+
 	}
 	// activate the shader
 	

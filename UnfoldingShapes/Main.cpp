@@ -5,13 +5,17 @@
 
 int main(int argc, char *argv[])
 {
+
+	std::cout << "finished compilation" << std::endl;
     QApplication a(argc, argv);
-    //UnfoldingShapes w;
+    UnfoldingShapes w;
 
 	OpenGLWidget opengl;
-	//w.setOpenGLWidget(new OpenGLWidget());
+	w.setOpenGLWidget(new OpenGLWidget());
 	opengl.show();
-	//w.show();
+	w.show();
+
+	std::cout << "finished init" << std::endl;
 
     return a.exec();
 }

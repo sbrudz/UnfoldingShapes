@@ -118,11 +118,11 @@ public:
 
 		// text cube setup
 		testCubeShader = Shader(f, "resources/shaders/cube.vs", "resources/shaders/cube.fs");
-		//generateTestCube();
+		generateTestCube();
 
 		// local shader
 		// shader = Shader("resources/shaders/basic_model.vs", "resources/shaders/basic_model.fs");
-		//shader = Shader("resources/shaders/lighted_model.vs", "resources/shaders/lighted_model.fs");
+		shader = Shader(f, "resources/shaders/lighted_model.vs", "resources/shaders/lighted_model.fs");
 		
 		f->glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	}
@@ -139,10 +139,13 @@ public:
 		// prep for render
 		f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		drawTestCube(glm::vec3(0,0,4));
+
+
+		
 		// model rendering
 		shader.use();
 
-		
 		// if the light is valid then enter lighting mode for shader
 		if (light.enabled) {
 			shader.setBool("enableLighting", true);
@@ -275,7 +278,7 @@ public:
 		};
 
 		// init shaders
-		shader = Shader(f, "resources/shaders/cube.vs", "resources/shaders/cube.fs");
+		// shader = Shader(f, "resources/shaders/cube.vs", "resources/shaders/cube.fs");
 
 		// load vbo and make vao
 		f->glGenVertexArrays(1, &VAO);
@@ -289,7 +292,7 @@ public:
 		f->glEnableVertexAttribArray(0);
 	}
 
-	void drawTestCube(glm::vec3 pos) {
+	void drawTestCube(glm::vec3 pos = glm::vec3(0)) {
 		// draw it
 		// use shader and set view and projection panes
 		
