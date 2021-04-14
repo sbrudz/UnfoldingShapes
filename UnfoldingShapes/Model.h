@@ -24,7 +24,7 @@
 #include <map>
 #include <iostream>
 
-inline unsigned int TextureFromFile(const char *path, const string &directory, int samples = 1, bool gamma = false);
+//inline unsigned int TextureFromFile(const char *path, const string &directory, int samples = 1, bool gamma = false);
 
 // prototypes
 //bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
@@ -43,16 +43,20 @@ public:
 	int samples;
 
 	//expects file path to 3d model with multisampling
-	Model(string const &path, int samples, bool gamma = false) : gammaCorrection(gamma)
+	Model(QOpenGLFunctions_3_3_Core *f, string const &path, int samples, bool gamma = false) : gammaCorrection(gamma)
 	{
+		this->f = f;
+
 		this->samples = samples;
 
 		loadModel(path);
 	}
 
 	//expects file path to 3d model
-	Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+	Model(QOpenGLFunctions_3_3_Core *f, string const &path, bool gamma = false) : gammaCorrection(gamma)
 	{
+		this->f = f;
+
 		//default 1 sample
 		this->samples = 1;
 
@@ -108,6 +112,8 @@ public:
 	}
 
 private:
+	QOpenGLFunctions_3_3_Core *f;
+
 	void loadModel(string const &path)
 	{
 		//read file via ASSIMP
@@ -211,6 +217,7 @@ private:
 		}
 
 		//process material
+		/*
 		if (mesh->mMaterialIndex >= 0)
 		{
 			//assimp material
@@ -268,6 +275,7 @@ private:
 			std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 			textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 		}
+		*/
 
 		/*
 		std::cout << "vertices(" << vertices.size() << "): ";
@@ -426,7 +434,7 @@ private:
 			std::cout << std::endl;
 			*/
 
-			output.push_back(Mesh(consolidatedVertices, repairedIndices, textures, materials, samples));
+			output.push_back(Mesh(f, consolidatedVertices, repairedIndices, textures, materials, samples));
 		}
 
 		std::cout << "finished packing " << output.size() << " faces" << std::endl;
@@ -434,6 +442,7 @@ private:
 		return output;
 	}
 
+	/*
 	//unpacks the textures from assimp into the texture struct so it's more manipulatable
 	vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
 		vector<Texture> textures;
@@ -463,6 +472,7 @@ private:
 		}
 		return textures;
 	}
+	*/
 
 	// utility
 	glm::vec4 getPlane(vector<Vertex> vert) {

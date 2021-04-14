@@ -49,9 +49,7 @@ public:
 	}
 
 	// main update function for all animations
-	void update(GraphicsEngine* graphics) {
-		this->graphics = graphics;
-
+	void update() {
 		for (int i = 0; i < animations.size(); i++) {
 			if (animations[i].progress < 0.0f) {
 				// first revert
@@ -133,8 +131,6 @@ private:
 	// controls related stuff
 	bool paused;
 	float speed;
-
-	GraphicsEngine* graphics;
 
 	// which of the available algortihms is being used
 	int activeAlgorithm;

@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_UnfoldingShapes.h"
+#include "OpenGLWidget.h"
 
 class UnfoldingShapes : public QMainWindow
 {
@@ -12,6 +13,10 @@ public:
     UnfoldingShapes(QWidget *parent = Q_NULLPTR) : QMainWindow(parent)
 	{
 		ui.setupUi(this);
+	}
+
+	OpenGLWidget* getGraphics() {
+		return ui.openGLWidget;
 	}
 
 private:

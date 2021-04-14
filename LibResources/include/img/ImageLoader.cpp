@@ -1,8 +1,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "ImageLoader.h"
-#include "img/stb_image.h"
-#include <glad/glad.h>
-#include <GLFW\glfw3.h>
+#include <img/stb_image.h>
+//#include <glad/glad.h>
+//#include <GLFW\glfw3.h>
+#include <qopenglwidget.h>
+#include <qopenglfunctions_3_3_core.h>
 #include <string>
 #include <iostream>
 
@@ -23,7 +25,7 @@ class DataLoader {
 		if (data)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			//glGenerateMipmap(GL_TEXTURE_2D);
 			toReturn = true;
 		}
 		else

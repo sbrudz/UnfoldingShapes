@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     UnfoldingShapes w;
 
-	Runner runner;
+	Runner runner(w.getGraphics());
 
 	//OpenGLWidget opengl;
 	//opengl.show();

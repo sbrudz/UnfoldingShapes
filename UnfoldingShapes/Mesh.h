@@ -83,8 +83,10 @@ public:
 	// backup data
 	vector<Vertex> backupVertices;
 
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<Material> materials, int samples)
+	Mesh(QOpenGLFunctions_3_3_Core *f, vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<Material> materials, int samples)
 	{
+		this->f = f;
+
 		this->vertices = vertices;
 		this->indices = indices;
 		this->textures = textures;
@@ -102,8 +104,6 @@ public:
 	//render the mesh
 	void Draw(Shader &shader)
 	{
-		QOpenGLFunctions_3_3_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
-
 		shader.use();
 
 		//default
@@ -181,8 +181,6 @@ public:
 	}
 
 	void render() {
-		QOpenGLFunctions_3_3_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
-
 		f->glBindVertexArray(VAO);
 		f->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		f->glBindVertexArray(0);
@@ -198,12 +196,12 @@ public:
 	}
 
 private:
+	QOpenGLFunctions_3_3_Core *f;
+
 	//render data 
 	unsigned int VBO, EBO;
 
 	void clearBuffers() {
-		QOpenGLFunctions_3_3_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
-
 		// clear data to preserve memory
 		f->glDeleteVertexArrays(1, &VAO);
 		f->glDeleteBuffers(1, &VBO);
@@ -213,7 +211,9 @@ private:
 	//initializes all the buffer objects/arrays
 	void setupMesh()
 	{
-		QOpenGLFunctions_3_3_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+		if (f == nullptr) {
+			std::cout << "ahhhhh";
+		}
 
 		//create buffers/arrays
 		f->glGenVertexArrays(1, &VAO);

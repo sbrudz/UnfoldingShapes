@@ -4,6 +4,8 @@
 #include <qobject.h>
 #include <qtimer.h>
 
+#include "OpenGLWidget.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -27,7 +29,7 @@
 #include "Shape.h"
 #include "UnfoldSolution.h"
 #include "Unfold.h"
-//#include "Animator.h"
+#include "Animator.h"
 
 using namespace std;
 
@@ -84,25 +86,26 @@ public:
 	// game
 	int gameState;
 
-	//GraphicsEngine* graphics;
+	OpenGLWidget* graphics;
 
 	vector<Shape*> shapes;
 
-	//Animator animator;
+	Animator animator;
 
 	QTimer *timer;
 
-	Runner(QObject* parent = nullptr) : QObject(parent) {
+	Runner(OpenGLWidget* graphics, QObject* parent = nullptr) : QObject(parent) {
+		this->graphics = graphics;
+
 		setup();
 	}
 
 	void setup() {
 		// set timer for each frame to update
 		timer = new QTimer(this);
-		connect(timer, &QTimer::timeout, this, &frame);
-		timer->start(1000);
+		QObject::connect(timer, &QTimer::timeout, this, &Runner::frame);
+		timer->start(1000/fps);
 
-		/*
 		// add all the models that are going to be used immediatley
 
 		// set skybox
@@ -119,8 +122,8 @@ public:
 		graphics->camera.pitch -= 22.5f;
 
 		// set text
-		graphics->addText("FPS: 0", "fps", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
-		graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 63, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+		//graphics->addText("FPS: 0", "fps", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
+		//graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 63, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
 
 
 		// set callbacks
@@ -131,7 +134,7 @@ public:
 		//shapes.push_back(new Shape(backpackModel));
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
-		//shapes.push_back(new Shape(cubeModel));
+		shapes.push_back(new Shape(cubeModel, graphics));
 		//shapes.push_back(new Shape(dodecahedronModel, graphics));
 
 		for (int i = 0; i < shapes.size(); i++) {
@@ -153,26 +156,25 @@ public:
 		fpsCounter = 0;
 
 		gameState = 1;
-		*/
 	}
 
 	void frame() {
 		std::cout << "here" << std::endl;
+
 		// START timer
-		/*
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
 		// Main
 		// update controls
-		updateControls(graphics->window, animator);
+		//updateControls(graphics->window, animator);
 
-		animator.update(graphics);
+		animator.update();
 
 		// update player position
-		graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));
+		//graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));
 
-		// render frame
-		gameState = graphics->renderFrame();
+		// render frame (NO LONGER NEEDED SINCE IT PAINTS AUTOMATICALLY ANYWAYS)
+		//gameState = graphics->renderFrame();
 
 		// END of timer sleep and normalize the clock
 		std::chrono::system_clock::time_point after = std::chrono::system_clock::now();
@@ -195,7 +197,7 @@ public:
 				std::cout << "\rFPS: " << fpsCounter / fpsCount;
 
 				// set text
-				graphics->setText("fps", "FPS: " + std::to_string(int(fpsCounter / fpsCount)));
+				//graphics->setText("fps", "FPS: " + std::to_string(int(fpsCounter / fpsCount)));
 			}
 			fpsCount = 0;
 			fpsCounter = 0;
@@ -207,7 +209,6 @@ public:
 
 		// std::cout << sleepDuration << std::endl;
 		Sleep(sleepDuration);
-		*/
 	}
 
 	// utility functions
