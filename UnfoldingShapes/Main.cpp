@@ -4,6 +4,10 @@
 #include <QtWidgets/qopenglwidget.h>
 #include "Runner.h"
 
+// we have to delay the runner setup because opengl must be initialized first
+Runner *runner;
+void createRunner(OpenGLWidget *w);
+
 int main(int argc, char *argv[])
 {
 
@@ -11,13 +15,15 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     UnfoldingShapes w;
 
-	Runner runner(w.getGraphics());
+	w.delayedSetup(&createRunner);
 
-	//OpenGLWidget opengl;
-	//opengl.show();
 	w.show();
 
 	std::cout << "finished init" << std::endl;
 
     return a.exec();
+}
+
+void createRunner(OpenGLWidget *w) {
+	runner = new Runner(w);
 }

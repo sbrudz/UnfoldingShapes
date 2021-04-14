@@ -192,7 +192,7 @@ public:
 
 		clearBuffers();
 
-		setupMesh();
+		//setupMesh();
 	}
 
 private:
@@ -211,10 +211,6 @@ private:
 	//initializes all the buffer objects/arrays
 	void setupMesh()
 	{
-		if (f == nullptr) {
-			std::cout << "ahhhhh";
-		}
-
 		//create buffers/arrays
 		f->glGenVertexArrays(1, &VAO);
 		f->glGenBuffers(1, &VBO);
@@ -224,6 +220,7 @@ private:
 		// load data into vertex buffers
 		f->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
+		
 		//Tip from learnopengl.com
 		//A great thing about structs is that their memory layout is sequential for all its items.
 		//The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which

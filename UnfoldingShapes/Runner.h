@@ -159,7 +159,7 @@ public:
 	}
 
 	void frame() {
-		std::cout << "here" << std::endl;
+		//std::cout << "here" << std::endl;
 
 		// START timer
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -169,12 +169,13 @@ public:
 		//updateControls(graphics->window, animator);
 
 		animator.update();
+		shapes[0]->asset->position = shapes[0]->asset->position + glm::vec3(0.01f, 0, 0);
 
 		// update player position
 		//graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));
 
-		// render frame (NO LONGER NEEDED SINCE IT PAINTS AUTOMATICALLY ANYWAYS)
-		//gameState = graphics->renderFrame();
+		// update renderer
+		graphics->update();
 
 		// END of timer sleep and normalize the clock
 		std::chrono::system_clock::time_point after = std::chrono::system_clock::now();

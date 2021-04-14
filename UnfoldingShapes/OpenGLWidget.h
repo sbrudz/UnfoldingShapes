@@ -35,6 +35,9 @@ public:
 	// start of class code
 	QOpenGLFunctions_3_3_Core *f;
 
+	// delayed callback for init after gl is initialized
+	void(*afterGLInit)(OpenGLWidget*) = nullptr;
+
 	Camera camera;
 
 	Shader shader;
@@ -84,6 +87,10 @@ public:
 		setFormat(format);
 	}
 
+	void setAfterGLInit(void m(OpenGLWidget*)) {
+		afterGLInit = m;
+	}
+
 	void initializeGL() override {
 		f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
 		
@@ -111,6 +118,9 @@ public:
 		shader = Shader(f, "resources/shaders/lighted_model.vs", "resources/shaders/lighted_model.fs");
 		
 		f->glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+
+		// after init
+		afterGLInit(this);
 	}
 
 	void paintGL() override {
@@ -125,6 +135,7 @@ public:
 		// prep for render
 		f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		generateTestCube();
 		drawTestCube(glm::vec3(0,0,4));
 		
 		// model rendering

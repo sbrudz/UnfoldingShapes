@@ -19,6 +19,10 @@ public:
 		return ui.openGLWidget;
 	}
 
+	void delayedSetup(void m(OpenGLWidget*)) {
+		ui.openGLWidget->setAfterGLInit(m);
+	}
+
 private:
     Ui::UnfoldingShapesClass ui;
 };
