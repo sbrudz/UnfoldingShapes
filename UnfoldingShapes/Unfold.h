@@ -69,15 +69,56 @@ private:
 		}
 	}
 
+	static void randomBreadthPopulation(Graph<Face>::Node* root, Graph<Face>* solution) {
+		vector<Graph<Face>::Node*> queue;
+		vector<Graph<Face>::Node*> visited;
+
+		queue.push_back(root);
+		visited.push_back(root);
+
+		Graph<Face>::Node* current;
+
+		// random seed
+		srand(time(NULL));
+
+		while (!queue.empty()) {
+			current = queue[0];
+			queue.erase(queue.begin());
+
+			Graph<Face>::Node* currentSolutionNode = solution->findNode(root, current->data);
+
+			// randomly shuffle the connections order
+			vector<Graph<Face>::Node*> randConnections = current->connections;
+			random_shuffle(randConnections.begin(), randConnections.end());
+
+			for (int i = 0; i < randConnections.size(); i++) {
+				bool inList = false;
+
+				for (int x = 0; x < visited.size(); x++) {
+					if (visited[x] == current->connections[i]) {
+						inList = true;
+						break;
+					}
+				}
+
+				if (!inList) {
+					solution->newNode(currentSolutionNode, current->connections[i]->data);
+
+					visited.push_back(current->connections[i]);
+					queue.push_back(current->connections[i]);
+				}
+			}
+		}
+	}
+
 public:
 	static Graph<Face>* basic(Shape* shape) {
 		// init solution with the base 
 		// std::cout << shape->faceMap.rootNode << std::endl;
+
 		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
 		basicRecusivePopulation(shape->faceMap.rootNode, solution, solution->rootNode);
-
-		// quick fix (remove the last element of the graph)
 
 		return solution;
 	}
@@ -85,9 +126,24 @@ public:
 	static Graph<Face>* breadthUnfold(Shape* shape) {
 		// init solution with the base 
 		// std::cout << shape->faceMap.rootNode << std::endl;
+
 		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
 		breadthPopulation(shape->faceMap.rootNode, solution);
+
+		std::cout << solution->size << std::endl;
+
+		return solution;
+	}
+
+	static Graph<Face>* randomBreadthUnfold(Shape* shape) {
+		// init solution with the base 
+		// std::cout << shape->faceMap.rootNode << std::endl;
+		srand(time(NULL));
+
+		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
+
+		randomBreadthPopulation(shape->faceMap.rootNode, solution);
 
 		std::cout << solution->size << std::endl;
 

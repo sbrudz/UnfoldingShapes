@@ -76,13 +76,14 @@ public:
 	}
 
 	void setup() {
-		samples = 1;
+		samples = 8;
 	}
 
 	void initFormat() {
 		QSurfaceFormat format;
 		format.setVersion(3, 3);
 		format.setProfile(QSurfaceFormat::CoreProfile);
+		format.setSamples(samples);
 
 		setFormat(format);
 	}
@@ -93,9 +94,13 @@ public:
 
 	void initializeGL() override {
 		f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
-		
+
 		// configure global opengl state
 		f->glEnable(GL_DEPTH_TEST);
+
+		if (samples > 1) {
+			f->glEnable(GL_MULTISAMPLE);
+		}
 
 		// Camera
 		camera = Camera(width(), height(), glm::vec3(0), true);
@@ -111,7 +116,7 @@ public:
 
 		// text cube setup
 		testCubeShader = Shader(f, "resources/shaders/cube.vs", "resources/shaders/cube.fs");
-		generateTestCube();
+		//generateTestCube();
 
 		// local shader
 		// shader = Shader("resources/shaders/basic_model.vs", "resources/shaders/basic_model.fs");
@@ -135,8 +140,8 @@ public:
 		// prep for render
 		f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		generateTestCube();
-		drawTestCube(glm::vec3(0,0,4));
+		//generateTestCube();
+		//drawTestCube(glm::vec3(0,0,4));
 		
 		// model rendering
 		shader.use();
@@ -274,6 +279,10 @@ public:
 
 		// init shaders
 		// shader = Shader(f, "resources/shaders/cube.vs", "resources/shaders/cube.fs");
+
+		// clear data to preserve memory
+		f->glDeleteVertexArrays(1, &VAO);
+		f->glDeleteBuffers(1, &VBO);
 
 		// load vbo and make vao
 		f->glGenVertexArrays(1, &VAO);

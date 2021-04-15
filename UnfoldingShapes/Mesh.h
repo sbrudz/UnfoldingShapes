@@ -83,7 +83,7 @@ public:
 	// backup data
 	vector<Vertex> backupVertices;
 
-	Mesh(QOpenGLFunctions_3_3_Core *f, vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<Material> materials, int samples)
+	Mesh(QOpenGLFunctions_3_3_Core **f, vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<Material> materials, int samples)
 	{
 		this->f = f;
 
@@ -120,7 +120,7 @@ public:
 			unsigned int heightNr = 1;
 			for (int i = 0; i < textures.size(); i++)
 			{
-				f->glActiveTexture(GL_TEXTURE0 + i); //active texture unit before binding
+				(*f)->glActiveTexture(GL_TEXTURE0 + i); //active texture unit before binding
 				//retrieve texture number (the N in diffuse_textureN)
 				string number;
 				string name = textures[i].type;
@@ -146,10 +146,10 @@ public:
 				//finally bind the texture
 				//multisampling
 				if (samples > 1) {
-					f->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textures[i].id);
+					(*f)->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textures[i].id);
 				}
 				else {
-					f->glBindTexture(GL_TEXTURE_2D, textures[i].id);
+					(*f)->glBindTexture(GL_TEXTURE_2D, textures[i].id);
 				}
 			}
 		}
@@ -177,77 +177,82 @@ public:
 		render();
 
 		//reset back to default settings
-		f->glActiveTexture(GL_TEXTURE0);
+		(*f)->glActiveTexture(GL_TEXTURE0);
 	}
 
 	void render() {
-		f->glBindVertexArray(VAO);
-		f->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		f->glBindVertexArray(0);
+		(*f)->glBindVertexArray(VAO);
+		(*f)->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		(*f)->glBindVertexArray(0);
 	}
 
 	// reset the mesh and also recalculate the normals
 	void rebuild() {
 		recompileNormals();
 
-		clearBuffers();
+		//clearBuffers();
 
 		//setupMesh();
+		rebuildMesh();
 	}
 
 private:
-	QOpenGLFunctions_3_3_Core *f;
+	QOpenGLFunctions_3_3_Core **f;
 
 	//render data 
 	unsigned int VBO, EBO;
 
 	void clearBuffers() {
 		// clear data to preserve memory
-		f->glDeleteVertexArrays(1, &VAO);
-		f->glDeleteBuffers(1, &VBO);
-		f->glDeleteBuffers(1, &EBO);
+		(*f)->glDeleteVertexArrays(1, &VAO);
+		(*f)->glDeleteBuffers(1, &VBO);
+		(*f)->glDeleteBuffers(1, &EBO);
 	}
 
 	//initializes all the buffer objects/arrays
 	void setupMesh()
 	{
 		//create buffers/arrays
-		f->glGenVertexArrays(1, &VAO);
-		f->glGenBuffers(1, &VBO);
-		f->glGenBuffers(1, &EBO);
+		(*f)->glGenVertexArrays(1, &VAO);
+		(*f)->glGenBuffers(1, &VBO);
+		(*f)->glGenBuffers(1, &EBO);
 
-		f->glBindVertexArray(VAO);
+		rebuildMesh();
+	}
+
+	void rebuildMesh() {
+		(*f)->glBindVertexArray(VAO);
 		// load data into vertex buffers
-		f->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		(*f)->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-		
+
 		//Tip from learnopengl.com
 		//A great thing about structs is that their memory layout is sequential for all its items.
 		//The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
 		//again translates to 3/2 floats which translates to a byte array.
-		f->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+		(*f)->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-		f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+		(*f)->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		(*f)->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 		//set the vertex attribute pointers
 		//vertex Positions
-		f->glEnableVertexAttribArray(0);
-		f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+		(*f)->glEnableVertexAttribArray(0);
+		(*f)->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 		//vertex normals
-		f->glEnableVertexAttribArray(1);
-		f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+		(*f)->glEnableVertexAttribArray(1);
+		(*f)->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 		//vertex texture coords
-		f->glEnableVertexAttribArray(2);
-		f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+		(*f)->glEnableVertexAttribArray(2);
+		(*f)->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 		//vertex tangent
-		f->glEnableVertexAttribArray(3);
-		f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+		(*f)->glEnableVertexAttribArray(3);
+		(*f)->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 		//vertex bitangent
-		f->glEnableVertexAttribArray(4);
-		f->glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+		(*f)->glEnableVertexAttribArray(4);
+		(*f)->glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
-		f->glBindVertexArray(0);
+		(*f)->glBindVertexArray(0);
 	}
 
 	void recompileNormals() {

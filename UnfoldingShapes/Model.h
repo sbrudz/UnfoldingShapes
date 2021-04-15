@@ -43,7 +43,7 @@ public:
 	int samples;
 
 	//expects file path to 3d model with multisampling
-	Model(QOpenGLFunctions_3_3_Core *f, string const &path, int samples, bool gamma = false) : gammaCorrection(gamma)
+	Model(QOpenGLFunctions_3_3_Core **f, string const &path, int samples, bool gamma = false) : gammaCorrection(gamma)
 	{
 		this->f = f;
 
@@ -53,7 +53,7 @@ public:
 	}
 
 	//expects file path to 3d model
-	Model(QOpenGLFunctions_3_3_Core *f, string const &path, bool gamma = false) : gammaCorrection(gamma)
+	Model(QOpenGLFunctions_3_3_Core **f, string const &path, bool gamma = false) : gammaCorrection(gamma)
 	{
 		this->f = f;
 
@@ -112,7 +112,7 @@ public:
 	}
 
 private:
-	QOpenGLFunctions_3_3_Core *f;
+	QOpenGLFunctions_3_3_Core **f;
 
 	void loadModel(string const &path)
 	{

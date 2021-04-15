@@ -145,8 +145,9 @@ public:
 
 		// unfold = Unfold::breadthUnfold(shapes[0]);
 		for (int i = 0; i < shapes.size(); i++) {
-			shapes[i]->unfolds.push_back(Unfold::basic(shapes[0]));
-			//shapes[i]->unfolds.push_back(Unfold::breadthUnfold(shapes[0]));
+			shapes[i]->unfolds.push_back(Unfold::basic(shapes[i]));
+			//shapes[i]->unfolds.push_back(Unfold::breadthUnfold(shapes[i]));
+			//shapes[i]->unfolds.push_back(Unfold::randomBreadthUnfold(shapes[i]));
 
 			animator.addAnimation(shapes[i], shapes[i]->unfolds[0], 15);
 		}
@@ -169,7 +170,6 @@ public:
 		//updateControls(graphics->window, animator);
 
 		animator.update();
-		shapes[0]->asset->position = shapes[0]->asset->position + glm::vec3(0.01f, 0, 0);
 
 		// update player position
 		//graphics->setText("position", "Position: " + glm::to_string(graphics->camera.pos));
