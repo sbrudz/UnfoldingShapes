@@ -4,8 +4,7 @@
 //#include <glad/glad.h>
 //#include <GLFW/glfw3.h>
 
-//#include "img/ImageLoader.h"
-//#include "img/stb_image.h"
+#include "img/stb_image.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,10 +23,10 @@
 #include <map>
 #include <iostream>
 
-//inline unsigned int TextureFromFile(const char *path, const string &directory, int samples = 1, bool gamma = false);
+inline unsigned int TextureFromFile(QOpenGLFunctions_3_3_Core **f, const char *path, const string &directory, int samples = 1, bool gamma = false);
 
 // prototypes
-//bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
+bool tangantFace(vector<Vertex> vertices1, vector<Vertex> vertices2);
 
 //Do not reinitialize the model
 class Model {
@@ -217,7 +216,6 @@ private:
 		}
 
 		//process material
-		/*
 		if (mesh->mMaterialIndex >= 0)
 		{
 			//assimp material
@@ -275,7 +273,6 @@ private:
 			std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 			textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 		}
-		*/
 
 		/*
 		std::cout << "vertices(" << vertices.size() << "): ";
@@ -442,7 +439,6 @@ private:
 		return output;
 	}
 
-	/*
 	//unpacks the textures from assimp into the texture struct so it's more manipulatable
 	vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
 		vector<Texture> textures;
@@ -463,7 +459,7 @@ private:
 			if (!skip)
 			{   // if texture hasn't been loaded already, load it
 				Texture texture;
-				texture.id = TextureFromFile(str.C_Str(), directory, samples);
+				texture.id = TextureFromFile(f, str.C_Str(), directory, samples);
 				texture.type = typeName;
 				texture.path = str.C_Str();
 				textures.push_back(texture);
@@ -472,7 +468,6 @@ private:
 		}
 		return textures;
 	}
-	*/
 
 	// utility
 	glm::vec4 getPlane(vector<Vertex> vert) {
@@ -507,9 +502,8 @@ private:
 	}
 };
 
-/*
 //method from stb_image.h
-unsigned int TextureFromFile(const char *path, const string &directory, int samples, bool gamma)
+unsigned int TextureFromFile(QOpenGLFunctions_3_3_Core **f, const char *path, const string &directory, int samples, bool gamma)
 {
 	string filename = string(path);
 	filename = directory + "\\" + filename;
@@ -532,28 +526,27 @@ unsigned int TextureFromFile(const char *path, const string &directory, int samp
 
 		//multisampling (samples)x
 		if (samples > 1) {
-			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_TRUE);
-			glGenerateMipmap(GL_TEXTURE_2D_MULTISAMPLE);
+			(*f)->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
+			(*f)->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_TRUE);
+			(*f)->glGenerateMipmap(GL_TEXTURE_2D_MULTISAMPLE);
 
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+			(*f)->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			(*f)->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			(*f)->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			(*f)->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			(*f)->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureID, 0);
-			cout << "here" << endl;
+			(*f)->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureID, 0);
 		}
 		else {
-			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			(*f)->glBindTexture(GL_TEXTURE_2D, textureID);
+			(*f)->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			(*f)->glGenerateMipmap(GL_TEXTURE_2D);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			(*f)->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			(*f)->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			(*f)->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			(*f)->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
 
 		stbi_image_free(data);
@@ -566,6 +559,5 @@ unsigned int TextureFromFile(const char *path, const string &directory, int samp
 
 	return textureID;
 };
-*/
 
 #endif

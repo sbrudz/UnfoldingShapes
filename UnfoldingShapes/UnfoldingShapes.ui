@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1615</width>
+    <width>1640</width>
     <height>830</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <string>UnfoldingShapes</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="OpenGLWidget" name="openGLWidget">
+   <widget class="OpenGLWidget" name="openGLWidget" native="true">
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -50,6 +50,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>OpenGLWidget</class>
+   <extends>QWidget</extends>
+   <header>openglwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="UnfoldingShapes.qrc"/>
  </resources>
