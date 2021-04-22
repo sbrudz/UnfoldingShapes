@@ -5,6 +5,9 @@
 #include "ui_UnfoldingShapes.h"
 #include "OpenGLWidget.h"
 
+#include "Shape.h"
+#include "Animator.h"
+
 class UnfoldingShapes : public QMainWindow
 {
     Q_OBJECT
@@ -19,12 +22,28 @@ public:
 		return ui.openGLWidget;
 	}
 
+	// setup
 	void delayedSetup(void m(OpenGLWidget*)) {
 		ui.openGLWidget->setAfterGLInit(m);
 	}
 
+	void linkShapes(vector<Shape*>* shapes) {
+		this->shapes = shapes;
+	}
+
+	void linkAnimator(Animator* animator) {
+		this->animator = animator;
+	}
+
+	void addShapeToList(Shape* shape) {
+		ui.listWidget->addItem(shape->name.c_str());
+	}
+
 private:
     Ui::UnfoldingShapesClass ui;
+
+	vector<Shape*>* shapes;
+	Animator* animator;
 };
 
 #endif

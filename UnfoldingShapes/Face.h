@@ -14,8 +14,8 @@
 
 #include "Mesh.h"
 
-float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c);
-glm::vec3 closestPointOnLine(glm::vec3 line, glm::vec3 pointOnLine, glm::vec3 target);
+inline float getTriangleArea(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+inline glm::vec3 closestPointOnLine(glm::vec3 line, glm::vec3 pointOnLine, glm::vec3 target);
 
 // graphics method for each face
 class Face {

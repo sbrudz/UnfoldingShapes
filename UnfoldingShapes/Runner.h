@@ -5,6 +5,7 @@
 #include <qtimer.h>
 
 #include "OpenGLWidget.h"
+#include "UnfoldingShapes.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -87,6 +88,7 @@ public:
 	int gameState;
 
 	OpenGLWidget* graphics;
+	UnfoldingShapes* ui;
 
 	vector<Shape*> shapes;
 
@@ -94,8 +96,9 @@ public:
 
 	QTimer *timer;
 
-	Runner(OpenGLWidget* graphics, QObject* parent = nullptr) : QObject(parent) {
+	Runner(OpenGLWidget* graphics, UnfoldingShapes* ui, QObject* parent = nullptr) : QObject(parent) {
 		this->graphics = graphics;
+		this->ui = ui;
 
 		setup();
 	}
@@ -134,12 +137,8 @@ public:
 		//shapes.push_back(new Shape(backpackModel));
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
-		shapes.push_back(new Shape(cubeModel, graphics));
+		addShape(new Shape(cubeModel, graphics));
 		//shapes.push_back(new Shape(dodecahedronModel, graphics));
-
-		for (int i = 0; i < shapes.size(); i++) {
-			graphics->addAsset(shapes[i]->asset);
-		}
 
 		animator = Animator();
 
@@ -151,6 +150,10 @@ public:
 
 			animator.addAnimation(shapes[i], shapes[i]->unfolds[0], 15);
 		}
+
+		// set links
+		ui->linkAnimator(&animator);
+		ui->linkShapes(&shapes);
 
 		// fps and game init
 		fpsCount = 0;
@@ -210,6 +213,14 @@ public:
 
 		// std::cout << sleepDuration << std::endl;
 		Sleep(sleepDuration);
+	}
+
+	// add shape to animator
+	void addShape(Shape* shape) {
+		shapes.push_back(shape);
+		graphics->addAsset(shapes[shapes.size() - 1]->asset);
+
+		ui->addShapeToList(shapes[shapes.size() - 1]);
 	}
 
 	// utility functions

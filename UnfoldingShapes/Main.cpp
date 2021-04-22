@@ -6,6 +6,8 @@
 
 // we have to delay the runner setup because opengl must be initialized first
 Runner *runner;
+UnfoldingShapes* wPointer;
+
 void createRunner(OpenGLWidget *w);
 
 int main(int argc, char *argv[])
@@ -14,6 +16,7 @@ int main(int argc, char *argv[])
 	std::cout << "finished compilation" << std::endl;
     QApplication a(argc, argv);
     UnfoldingShapes w;
+	wPointer = &w;
 
 	w.delayedSetup(&createRunner);
 
@@ -25,5 +28,5 @@ int main(int argc, char *argv[])
 }
 
 void createRunner(OpenGLWidget *w) {
-	runner = new Runner(w);
+	runner = new Runner(w, wPointer);
 }

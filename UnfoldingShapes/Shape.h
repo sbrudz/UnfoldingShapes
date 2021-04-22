@@ -22,6 +22,8 @@
 
 #include "OpenGLWidget.h"
 
+inline string getNameFromPath(string path);
+
 class Shape {
 public:
 	struct Transformation {
@@ -92,6 +94,8 @@ public:
 	// stores the transformations applied to the shape so we can revert.
 	vector<Transformation> appliedTransformations;
 
+	string name;
+
 	// inactive
 	Shape() {
 		asset = nullptr;
@@ -102,6 +106,8 @@ public:
 	Shape(string const &path, OpenGLWidget* graphics, glm::vec3 pos = glm::vec3(0), glm::vec3 rot = glm::vec3(0), glm::vec3 scale = glm::vec3(1)) {
 		this->model = new Model(&(graphics->f), path, graphics->samples);
 		asset = new Asset(this->model, pos, rot, scale);
+
+		name = getNameFromPath(path);
 
 		initFaces();
 	}
@@ -246,5 +252,22 @@ private:
 		initAxisInfo();
 	}
 };
+
+string getNameFromPath(string path) {
+	string fileName = "";
+
+	for (int i = 0; i < path.size(); i++) {
+		if (path[i] == '.') {
+			for (int j = i; j >= 0; j--) {
+				if (path[j] == '\\' || path[j] == '/') {
+					fileName = path.substr(j + 1, i - (j + 1));
+					return fileName;
+				}
+			}
+		}
+	}
+
+	return "";
+}
 
 #endif
