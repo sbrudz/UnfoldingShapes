@@ -25,7 +25,6 @@ class Animator {
 public:
 	struct Animation {
 		Shape* shape;
-		Graph<Face>* solution;
 
 		// controls related stuff
 		bool paused;
@@ -40,7 +39,6 @@ public:
 
 		Animation(Shape* shape, bool paused = false, int algorithm = 1, float speed = 1) {
 			this->shape = shape;
-			this->solution = shape->unfold;
 			this->speed = speed;
 			progress = 0.0f;
 
@@ -87,7 +85,7 @@ public:
 	// main update function for all animations
 	void update() {
 		for (int i = 0; i < animations->size(); i++) {
-			if ((*animations)[i].solution != nullptr) {
+			if ((*animations)[i].shape->unfold != nullptr) {
 				if ((*animations)[i].progress < 0.0f) {
 					// first revert
 					(*animations)[i].shape->revert();
@@ -101,11 +99,11 @@ public:
 					// identify which algorithm to use
 					switch ((*animations)[i].activeAlgorithm) {
 					case 0: {
-						stepBasedUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+						stepBasedUpdate((*animations)[i].shape, (*animations)[i].shape->unfold->rootNode, (*animations)[i].progress);
 						break;
 					}
 					case 1: {
-						breadthFirstUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+						breadthFirstUpdate((*animations)[i].shape, (*animations)[i].shape->unfold->rootNode, (*animations)[i].progress);
 						break;
 					}
 					}
@@ -121,7 +119,7 @@ public:
 					// first revert
 					(*animations)[i].shape->revert();
 
-					breadthFirstUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+					breadthFirstUpdate((*animations)[i].shape, (*animations)[i].shape->unfold->rootNode, (*animations)[i].progress);
 				}
 
 				// rebuild the mesh for each shape

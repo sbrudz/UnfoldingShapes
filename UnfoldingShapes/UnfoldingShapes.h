@@ -53,7 +53,6 @@ public:
 			setUnfold(current, unfoldSetting);
 
 			Animator::Animation* animation = animator->getAnimation(current);
-			animation->solution = current->unfold;
 			animation->setAlgorithm(animationSetting);
 			animation->speed = speed;
 
@@ -64,8 +63,17 @@ public:
 	// utility
 	bool setUnfold(Shape* shape, int index) {
 		switch (index) {
+		case 0:
+			shape->setUnfold(Unfold::basic(shape));
+			break;
+		case 1:
+			shape->setUnfold(Unfold::randomBasic(shape));
+			break;
 		case 2:
 			shape->setUnfold(Unfold::breadthUnfold(shape));
+			break;
+		case 3:
+			shape->setUnfold(Unfold::randomBreadthUnfold(shape));
 			break;
 		default:
 			return false;

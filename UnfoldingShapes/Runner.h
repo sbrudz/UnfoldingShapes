@@ -120,7 +120,7 @@ public:
 
 
 		// set camera starting pos
-		graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f) * 0.33f * 2.0f);
+		graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f) * 0.33f * 4.0f);
 		graphics->camera.yaw += 45.0f;
 		graphics->camera.pitch -= 22.5f;
 

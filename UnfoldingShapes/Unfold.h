@@ -37,6 +37,22 @@ private:
 		}
 	}
 
+	static void randomBasicRecusivePopulation(Graph<Face>::Node* mapNode, Graph<Face>* solution, Graph<Face>::Node* parent) {
+		// randomly shuffle the connections order
+		vector<Graph<Face>::Node*> randConnections = mapNode->connections;
+		random_shuffle(randConnections.begin(), randConnections.end());
+
+		for (int i = 0; i < randConnections.size(); i++) {
+			if (solution->findNode(solution->rootNode, randConnections[i]->data) == nullptr) {
+				// set new parent
+				parent = solution->newNode(parent, randConnections[i]->data);
+
+				// recursive
+				basicRecusivePopulation(randConnections[i], solution, parent);
+			}
+		}
+	}
+
 	static void breadthPopulation(Graph<Face>::Node* root, Graph<Face>* solution) {
 		vector<Graph<Face>::Node*> queue;
 		vector<Graph<Face>::Node*> visited;
@@ -82,14 +98,11 @@ private:
 
 		Graph<Face>::Node* current;
 
-		// random seed
-		srand(time(NULL));
-
 		while (!queue.empty()) {
 			current = queue[0];
 			queue.erase(queue.begin());
 
-			Graph<Face>::Node* currentSolutionNode = solution->findNode(root, current->data);
+			Graph<Face>::Node* currentSolutionNode = solution->findNode(solution->rootNode, current->data);
 
 			// randomly shuffle the connections order
 			vector<Graph<Face>::Node*> randConnections = current->connections;
@@ -99,17 +112,17 @@ private:
 				bool inList = false;
 
 				for (int x = 0; x < visited.size(); x++) {
-					if (visited[x] == current->connections[i]) {
+					if (visited[x] == randConnections[i]) {
 						inList = true;
 						break;
 					}
 				}
 
 				if (!inList) {
-					solution->newNode(currentSolutionNode, current->connections[i]->data);
+					solution->newNode(currentSolutionNode, randConnections[i]->data);
 
-					visited.push_back(current->connections[i]);
-					queue.push_back(current->connections[i]);
+					visited.push_back(randConnections[i]);
+					queue.push_back(randConnections[i]);
 				}
 			}
 		}
@@ -123,6 +136,17 @@ public:
 		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
 		basicRecusivePopulation(shape->faceMap.rootNode, solution, solution->rootNode);
+
+		return solution;
+	}
+
+	static Graph<Face>* randomBasic(Shape* shape) {
+		// init solution with the base 
+		// std::cout << shape->faceMap.rootNode << std::endl;
+
+		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
+
+		randomBasicRecusivePopulation(shape->faceMap.rootNode, solution, solution->rootNode);
 
 		return solution;
 	}
@@ -143,7 +167,6 @@ public:
 	static Graph<Face>* randomBreadthUnfold(Shape* shape) {
 		// init solution with the base 
 		// std::cout << shape->faceMap.rootNode << std::endl;
-		srand(time(NULL));
 
 		Graph<Face>* solution = new Graph<Face>(shape->faceMap.rootNode->data);
 
@@ -159,6 +182,7 @@ public:
 template<class RandomIt>
 void random_shuffle(RandomIt first, RandomIt last)
 {
+	srand(time(NULL));
 	typename std::iterator_traits<RandomIt>::difference_type i, n;
 	n = last - first;
 	for (i = n - 1; i > 0; --i) {
