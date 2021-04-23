@@ -27,113 +27,129 @@ public:
 		Shape* shape;
 		Graph<Face>* solution;
 
+		// controls related stuff
+		bool paused;
+
+		// which of the available algortihms is being used
+		int activeAlgorithm;
+
 		// milliseconds for animation to complete
-		float time;
+		float speed;
 
 		float progress;
 
-		Animation(Shape* shape, Graph<Face>* solution, float time) {
+		Animation(Shape* shape, bool paused = false, int algorithm = 1, float speed = 1) {
 			this->shape = shape;
-			this->solution = solution;
-			this->time = time;
+			this->solution = shape->unfold;
+			this->speed = speed;
 			progress = 0.0f;
+
+			this->activeAlgorithm = algorithm;
+			this->paused = paused;
+		}
+
+		bool isPaused() {
+			return paused;
+		}
+
+		void pause() {
+			paused = true;
+		}
+
+		void play() {
+			paused = false;
+		}
+
+		// input a decimal 0.0-1.0 to represet percentage
+		void scrub(float delta) {
+			progress += delta;
+		}
+
+		void incrementSpeed(float delta) {
+			speed += delta;
+		}
+
+		void shuffleAlgorithm() {
+			int algorithmCount = 2;
+
+			activeAlgorithm = (activeAlgorithm + 1) % algorithmCount;
+		}
+
+		void setAlgorithm(int n) {
+			activeAlgorithm = n;
 		}
 	};
 
 	Animator() {
-		activeAlgorithm = 1;
-		paused = false;
-		speed = 2.0f;
-
-		animations = vector<Animation>();
+		animations = new vector<Animation>();
 	}
 
 	// main update function for all animations
 	void update() {
-		for (int i = 0; i < animations.size(); i++) {
-			if (animations[i].progress < 0.0f) {
-				// first revert
-				animations[i].shape->revert();
+		for (int i = 0; i < animations->size(); i++) {
+			if ((*animations)[i].solution != nullptr) {
+				if ((*animations)[i].progress < 0.0f) {
+					// first revert
+					(*animations)[i].shape->revert();
 
-				animations[i].progress = 0.0f;
+					(*animations)[i].progress = 0.0f;
+				}
+				else if ((*animations)[i].progress < 1.0f) {
+					// first revert
+					(*animations)[i].shape->revert();
+
+					// identify which algorithm to use
+					switch ((*animations)[i].activeAlgorithm) {
+					case 0: {
+						stepBasedUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+						break;
+					}
+					case 1: {
+						breadthFirstUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+						break;
+					}
+					}
+
+					if (!(*animations)[i].paused) {
+						//std::cout << (*animations)[i].progress << std::endl;
+						(*animations)[i].progress += (*animations)[i].speed / (100 * 7.5f);
+					}
+				}
+				else if ((*animations)[i].progress > 1.0f) {
+					(*animations)[i].progress = 1.0f;
+
+					// first revert
+					(*animations)[i].shape->revert();
+
+					breadthFirstUpdate((*animations)[i].shape, (*animations)[i].solution->rootNode, (*animations)[i].progress);
+				}
+
+				// rebuild the mesh for each shape
+				(*animations)[i].shape->model->rebuildMeshes();
 			}
-			else if (animations[i].progress < 1.0f) {
-				// first revert
-				animations[i].shape->revert();
-
-				// identify which algorithm to use
-				switch (activeAlgorithm) {
-				case 0: {
-					stepBasedUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
-					break;
-				}
-				case 1: {
-					breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
-					break;
-				}
-				}
-
-				if (!paused) {
-					//std::cout << animations[i].progress << std::endl;
-					animations[i].progress += speed / (100 * animations[i].time);
-				}
-			}
-			else if (animations[i].progress > 1.0f) {
-				animations[i].progress = 1.0f;
-
-				// first revert
-				animations[i].shape->revert();
-
-				breadthFirstUpdate(animations[i].shape, animations[i].solution->rootNode, animations[i].progress);
-			}
-
-			// rebuild the mesh for each shape
-			animations[i].shape->model->rebuildMeshes();
 		}
 	}
 
-	void addAnimation(Shape* shape, Graph<Face>* solution, float time) {
-		animations.push_back(Animation(shape, solution, time));
-	}
+	// check if the animation for the shape already exists and if not then create it
+	void addAnimation(Shape* shape, bool paused = false, int algorithm = 1, float speed = 1) {
+		bool found = false;
 
-	bool isPaused() {
-		return paused;
-	}
-
-	void pause() {
-		paused = true;
-	}
-
-	void play() {
-		paused = false;
-	}
-
-	// input a decimal 0.0-1.0 to represet percentage
-	void scrub(float delta) {
-		for (int i = 0; i < animations.size(); i++) {
-			animations[i].progress += delta;
+		if (!found) {
+			animations->push_back(Animation(shape, paused, algorithm, speed));
 		}
 	}
 
-	void incrementSpeed(float delta) {
-		speed += delta;
-	}
-
-	void shuffleAlgorithm() {
-		int algorithmCount = 2;
-
-		activeAlgorithm = (activeAlgorithm + 1) % algorithmCount;
+	// becomes invalid after more animations are added
+	Animation* getAnimation(Shape* shape) {
+		for (int i = 0; i < animations->size(); i++) {
+			if ((*animations)[i].shape == shape) {
+				return &(*animations)[i];
+			}
+		}
 	}
 
 private:
-	vector<Animation> animations;
-
-	// controls related stuff
-	bool paused;
-	float speed;
-
-	// which of the available algortihms is being used
-	int activeAlgorithm;
+	vector<Animation>* animations;
 
 	void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
 		// add face of node

@@ -16,6 +16,8 @@ public:
     UnfoldingShapes(QWidget *parent = Q_NULLPTR) : QMainWindow(parent)
 	{
 		ui.setupUi(this);
+
+		connect(ui.applyProperties, &QPushButton::released, this, &UnfoldingShapes::applySettings);
 	}
 
 	OpenGLWidget* getGraphics() {
@@ -35,8 +37,52 @@ public:
 		this->animator = animator;
 	}
 
+	// runtime stuff
+	void applySettings() {
+		// retrieve info
+
+		// make sure a shape is selected in the menu
+		if (ui.listWidget->currentRow() != -1) {
+			Shape* current = (*shapes)[ui.listWidget->currentRow()];
+
+			int unfoldSetting = ui.unfoldMethodInput->currentIndex();
+			int animationSetting = ui.animationMethodInput->currentIndex();
+			float speed = ui.speedInput->value();
+			float scale = ui.scaleInput->value();
+
+			setUnfold(current, unfoldSetting);
+
+			Animator::Animation* animation = animator->getAnimation(current);
+			animation->solution = current->unfold;
+			animation->setAlgorithm(animationSetting);
+			animation->speed = speed;
+
+			animation->progress = 0;
+		}
+	}
+
+	// utility
+	bool setUnfold(Shape* shape, int index) {
+		switch (index) {
+		case 2:
+			shape->setUnfold(Unfold::breadthUnfold(shape));
+			break;
+		default:
+			return false;
+			break;
+		}
+
+		return true;
+	}
+
 	void addShapeToList(Shape* shape) {
 		ui.listWidget->addItem(shape->name.c_str());
+
+		// apply settings for base setup
+		// add the animation if the unfold generates successfully.
+		if (setUnfold(shape, 2)) {
+			animator->addAnimation(shape);
+		}
 	}
 
 private:

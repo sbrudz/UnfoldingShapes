@@ -60,11 +60,11 @@ public:
 
 	// prototypes
 	// control callback for clicking the mouse
-	//void mouse_button_callback_custom(GLFWwindow* window, int button, int action, int mods);
+	// void mouse_button_callback_custom(GLFWwindow* window, int button, int action, int mods);
 	// control callback for moving the mouse
-	//void mouse_callback_custom(GLFWwindow* window, double xpos, double ypos);
+	// void mouse_callback_custom(GLFWwindow* window, double xpos, double ypos);
 
-	//void updateControls(GLFWwindow* window, Animator &animator);
+	// void updateControls(GLFWwindow* window, Animator &animator);
 
 	// settings
 	float relativeScreenSize = 0.85;
@@ -90,7 +90,7 @@ public:
 	OpenGLWidget* graphics;
 	UnfoldingShapes* ui;
 
-	vector<Shape*> shapes;
+	vector<Shape*>* shapes;
 
 	Animator animator;
 
@@ -133,27 +133,20 @@ public:
 		//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
 		//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
 
+		// setup shapes
+		shapes = new vector<Shape*>;
+		animator = Animator();
+
+		// set links
+		ui->linkAnimator(&animator);
+		ui->linkShapes(shapes);
+
 		// add assets
 		//shapes.push_back(new Shape(backpackModel));
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
 		addShape(new Shape(cubeModel, graphics));
 		//shapes.push_back(new Shape(dodecahedronModel, graphics));
-
-		animator = Animator();
-
-		// unfold = Unfold::breadthUnfold(shapes[0]);
-		for (int i = 0; i < shapes.size(); i++) {
-			shapes[i]->unfolds.push_back(Unfold::basic(shapes[i]));
-			//shapes[i]->unfolds.push_back(Unfold::breadthUnfold(shapes[i]));
-			//shapes[i]->unfolds.push_back(Unfold::randomBreadthUnfold(shapes[i]));
-
-			animator.addAnimation(shapes[i], shapes[i]->unfolds[0], 15);
-		}
-
-		// set links
-		ui->linkAnimator(&animator);
-		ui->linkShapes(&shapes);
 
 		// fps and game init
 		fpsCount = 0;
@@ -217,10 +210,10 @@ public:
 
 	// add shape to animator
 	void addShape(Shape* shape) {
-		shapes.push_back(shape);
-		graphics->addAsset(shapes[shapes.size() - 1]->asset);
+		shapes->push_back(shape);
+		graphics->addAsset((*shapes)[shapes->size() - 1]->asset);
 
-		ui->addShapeToList(shapes[shapes.size() - 1]);
+		ui->addShapeToList((*shapes)[shapes->size() - 1]);
 	}
 
 	// utility functions

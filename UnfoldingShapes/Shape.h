@@ -89,7 +89,7 @@ public:
 	vector<Face*> faces;
 	Graph<Face> faceMap;
 
-	vector<Graph<Face>*> unfolds;
+	Graph<Face>* unfold;
 
 	// stores the transformations applied to the shape so we can revert.
 	vector<Transformation> appliedTransformations;
@@ -110,6 +110,12 @@ public:
 		name = getNameFromPath(path);
 
 		initFaces();
+	}
+
+	void setUnfold(Graph<Face>* newSolution) {
+		revert();
+
+		unfold = newSolution;
 	}
 
 	// add transformation to the shape

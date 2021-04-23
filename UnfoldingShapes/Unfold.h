@@ -52,7 +52,7 @@ private:
 
 			//std::cout << "New Animation Frame:" << std::endl;
 
-			Graph<Face>::Node* currentSolutionNode = solution->findNode(root, current->data);
+			Graph<Face>::Node* currentSolutionNode = solution->findNode(solution->rootNode, current->data);
 			for (int i = 0; i < current->connections.size(); i++) {
 				bool inList = false;
 
