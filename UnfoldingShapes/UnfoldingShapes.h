@@ -41,9 +41,9 @@ public:
 		// setup controller loop
 		controlHZ = 60;
 
-		controlsTimer = new QTimer(this);
-		QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateMouse);
-		controlsTimer->start(1000 / controlHZ);
+		//controlsTimer = new QTimer(this);
+		//QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateMouse);
+		//controlsTimer->start(1000 / controlHZ);
 	}
 
 	void linkShapes(vector<Shape*>* shapes) {
