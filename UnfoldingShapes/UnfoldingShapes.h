@@ -29,6 +29,23 @@ public:
 		ui.openGLWidget->setAfterGLInit(m);
 	}
 
+	void cameraSetup() {
+		origin = glm::vec3(0);
+		zoom = 4.0f;
+
+		// set camera starting pos
+		ui.openGLWidget->camera.setPos(origin + glm::vec3(2.0f, 1.0f, -2.0f) * zoom);
+		
+		ui.openGLWidget->camera.lookAtTarget(origin);
+
+		// setup controller loop
+		controlHZ = 60;
+
+		controlsTimer = new QTimer(this);
+		QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateMouse);
+		controlsTimer->start(1000 / controlHZ);
+	}
+
 	void linkShapes(vector<Shape*>* shapes) {
 		this->shapes = shapes;
 	}
@@ -98,6 +115,18 @@ private:
 
 	vector<Shape*>* shapes;
 	Animator* animator;
+
+	// camera settings
+	glm::vec3 origin;
+	float zoom;
+
+	// control loop
+	QTimer* controlsTimer;
+	int controlHZ;
+
+	void updateMouse() {
+
+	}
 };
 
 #endif

@@ -76,7 +76,7 @@ public:
 	}
 
 	void setup() {
-		samples = 4;
+		samples = 1;
 	}
 
 	void initFormat() {

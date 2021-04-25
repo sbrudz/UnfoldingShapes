@@ -118,16 +118,9 @@ public:
 		graphics->setLight(glm::vec3(100, 150, 100), glm::vec3(1));
 		graphics->getLight()->visible = false;
 
-
-		// set camera starting pos
-		graphics->camera.setPos(glm::vec3(10.0f, 5.0f, -10.0f) * 0.33f * 4.0f);
-		graphics->camera.yaw += 45.0f;
-		graphics->camera.pitch -= 22.5f;
-
 		// set text
 		//graphics->addText("FPS: 0", "fps", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
 		//graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 63, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
-
 
 		// set callbacks
 		//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
@@ -137,9 +130,10 @@ public:
 		shapes = new vector<Shape*>;
 		animator = Animator();
 
-		// set links
+		// set links and setup
 		ui->linkAnimator(&animator);
 		ui->linkShapes(shapes);
+		ui->cameraSetup();
 
 		// add assets
 		//shapes.push_back(new Shape(backpackModel));
