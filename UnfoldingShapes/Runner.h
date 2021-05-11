@@ -140,7 +140,7 @@ public:
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
 		addShape(new Shape(cubeModel, graphics));
-		//shapes.push_back(new Shape(dodecahedronModel, graphics));
+		addShape(new Shape(dodecahedronModel, graphics));
 
 		// fps and game init
 		fpsCount = 0;

@@ -58,6 +58,11 @@ public:
 			paused = false;
 		}
 
+		void stop() {
+			paused = true;
+			progress = 0;
+		}
+
 		// input a decimal 0.0-1.0 to represet percentage
 		void scrub(float delta) {
 			progress += delta;

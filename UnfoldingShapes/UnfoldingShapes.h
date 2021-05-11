@@ -17,7 +17,14 @@ public:
 	{
 		ui.setupUi(this);
 
+		// local init (the rest must be delayed because gl initializes after this)
+		focusedShape = nullptr;
+
+		// apply button
 		connect(ui.applyProperties, &QPushButton::released, this, &UnfoldingShapes::applySettings);
+
+		// select shape in list
+		connect(ui.listWidget, &QListWidget::itemClicked, this, &UnfoldingShapes::selectShape);
 	}
 
 	OpenGLWidget* getGraphics() {
@@ -34,7 +41,8 @@ public:
 		zoom = 4.0f;
 
 		// set camera starting pos
-		ui.openGLWidget->camera.setPos(origin + glm::vec3(2.0f, 1.0f, -2.0f) * zoom);
+		//ui.openGLWidget->camera.setPos(origin + glm::vec3(2.0f, 1.0f, -2.0f) * zoom);
+		ui.openGLWidget->camera.setPos(origin + glm::vec3(0.0f, 1.0f, -2.0f) * zoom);
 		
 		ui.openGLWidget->camera.lookAtTarget(origin);
 
@@ -48,10 +56,49 @@ public:
 
 	void linkShapes(vector<Shape*>* shapes) {
 		this->shapes = shapes;
+
+		setupBackBoard();
 	}
 
 	void linkAnimator(Animator* animator) {
 		this->animator = animator;
+	}
+
+	// runtime shape viewer things
+	void selectShape(QListWidgetItem* item) {
+		// ignore if nothing is selected
+		if (ui.listWidget->currentRow() != -1) {
+			// set current selection
+			Shape* shape = (*shapes)[ui.listWidget->currentRow()];
+
+			focusShape(shape);
+		}
+	}
+
+	// assumes shape pointer is already added to the shapes list
+	void focusShape(Shape* shape) {
+		// check if the client is emptying the focus shape
+		if (shape == nullptr) {
+			focusedShape = nullptr;
+			return;
+		}
+
+		// move the current focus back to its position
+		backboard->applyTransform();
+
+		// rotate so it is facing the correct way in the viewer
+		shape->asset->setRotation(glm::vec3(0, 45, 0));
+		shape->asset->position = origin;
+
+		// stop current animation of the focused shape
+		if (focusedShape != nullptr) {
+			animator->getAnimation(focusedShape)->stop();
+		}
+
+		focusedShape = shape;
+
+		// autostart animation
+		applySettings();
 	}
 
 	// runtime stuff
@@ -59,8 +106,8 @@ public:
 		// retrieve info
 
 		// make sure a shape is selected in the menu
-		if (ui.listWidget->currentRow() != -1) {
-			Shape* current = (*shapes)[ui.listWidget->currentRow()];
+		if (focusedShape != nullptr) {
+			Shape* current = focusedShape;
 
 			int unfoldSetting = ui.unfoldMethodInput->currentIndex();
 			int animationSetting = ui.animationMethodInput->currentIndex();
@@ -74,7 +121,13 @@ public:
 			animation->speed = speed;
 
 			animation->progress = 0;
+
+			animation->play();
 		}
+	}
+
+	void setupBackBoard() {
+		backboard = new Backboard(shapes, glm::vec3(0, -25, 50));
 	}
 
 	// utility
@@ -106,15 +159,72 @@ public:
 		// apply settings for base setup
 		// add the animation if the unfold generates successfully.
 		if (setUnfold(shape, 2)) {
-			animator->addAnimation(shape);
+			animator->addAnimation(shape, true);
 		}
+
+		backboard->applyTransform();
 	}
+
+	struct Backboard {
+		vector<Shape*>* shapes;
+
+		// top left
+		glm::vec3 position;
+
+		// width of board before wrapping to the bottom
+		int width;
+
+		//seperation between the shapes
+		glm::vec2 seperation;
+
+		// position is the top center of the backboard
+		Backboard(vector<Shape*>* shapes, glm::vec3 position, int width = 5, glm::vec2 seperation = glm::vec2(5,5)) {
+			this->shapes = shapes;
+			this->width = width;
+			this->seperation = seperation;
+			this->position = position;
+
+			applyTransform();
+		}
+
+		// move all the assets of the shapes to their proper position
+		void applyTransform() {
+			glm::vec3 pos = getTopLeft(position);
+
+			int col = 0;
+			int row = 0;
+
+			for (int i = 0; i < shapes->size(); i++) {
+				(*shapes)[i]->asset->setPosition(pos + glm::vec3(col*seperation.x, -1 * row * seperation.y, 0));
+				(*shapes)[i]->asset->setRotation(glm::vec3(0));
+
+				col++;
+
+				// new line
+				if (col >= width) {
+					col = 0;
+					row++;
+				}
+			}
+		}
+
+		// utility
+		// transform so the top left of the board is marked for transforms
+		glm::vec3 getTopLeft(glm::vec3 ) {
+			return position - glm::vec3((width - 1) * this->seperation.x, 0, 0);
+		}
+	};
 
 private:
     Ui::UnfoldingShapesClass ui;
 
 	vector<Shape*>* shapes;
 	Animator* animator;
+
+	// viewer pointers
+	Shape* focusedShape;
+
+	Backboard* backboard;
 
 	// camera settings
 	glm::vec3 origin;
