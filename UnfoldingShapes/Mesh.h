@@ -2,8 +2,8 @@
 #define MESH_H
 
 //#include <glad/glad.h> // holds all OpenGL type declarations
-#include <qopenglwidget.h>
-#include <qopenglfunctions_3_3_core.h>
+#include <QtWidgets/qopenglwidget.h>
+#include <QtGui/qopenglfunctions_3_3_core.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

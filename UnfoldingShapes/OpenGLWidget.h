@@ -1,10 +1,8 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include <QtDebug>
-
-#include <qopenglwidget.h>
-#include <qopenglfunctions_3_3_core.h>
+#include <QtWidgets/qopenglwidget.h>
+#include <QtGui/qopenglfunctions_3_3_core.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -37,6 +35,7 @@ public:
 
 	// delayed callback for init after gl is initialized
 	void(*afterGLInit)(OpenGLWidget*) = nullptr;
+	void(*mouseUpdateCallback)(QMouseEvent*) = nullptr;
 
 	Camera camera;
 
@@ -92,6 +91,10 @@ public:
 		afterGLInit = m;
 	}
 
+	void setMouseUpdateCallback(void m(QMouseEvent*)) {
+		mouseUpdateCallback = m;
+	}
+
 	void initializeGL() override {
 		f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
 
@@ -123,6 +126,7 @@ public:
 		shader = Shader(f, "resources/shaders/lighted_model.vs", "resources/shaders/lighted_model.fs");
 		
 		f->glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+
 
 		// after init
 		afterGLInit(this);
@@ -184,6 +188,33 @@ public:
 		}
 	}
 
+	// set mouse event handling to update mouse struct
+	void mousePressEvent(QMouseEvent* event) {
+		/*
+		glm::vec2 pos = glm::vec2(event->localPos().x, event->localPos().y);
+		if (mouseInsideWindow(pos)) {
+			mouse.pos = pos;
+		}
+		// let the original class use the event if it wants
+		else {
+			QOpenGLWidget::mousePressEvent(event);
+		}
+		*/
+
+		// callback and then original class
+		mouseUpdateCallback(event);
+		QOpenGLWidget::mousePressEvent(event);
+	}
+
+	bool mouseInsideWindow(glm::vec2 pos) {
+		if (pos.x > 0 && pos.y > 0 && pos.x < width() && pos.y < height()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	// legacy mouse handling
 	// switch Mouse Modes
 	void setMouseMode(MouseControlState state) {
 		if (state == MouseControlState::POV) {

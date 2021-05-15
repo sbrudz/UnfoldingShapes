@@ -4,6 +4,9 @@
 //#include <glad/glad.h>
 //#include <GLFW/glfw3.h>
 
+#include <QtWidgets/qopenglwidget.h>
+#include <QtGui/qopenglfunctions_3_3_core.h>
+
 #include "img/stb_image.h"
 
 #include <glm/glm.hpp>

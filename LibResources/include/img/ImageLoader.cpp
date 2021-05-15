@@ -3,8 +3,8 @@
 #include <img/stb_image.h>
 //#include <glad/glad.h>
 //#include <GLFW\glfw3.h>
-#include <qopenglwidget.h>
-#include <qopenglfunctions_3_3_core.h>
+#include <QtWidgets/qopenglwidget.h>
+#include <QtGui/qopenglfunctions_3_3_core.h>
 #include <string>
 #include <iostream>
 

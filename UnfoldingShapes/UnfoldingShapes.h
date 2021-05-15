@@ -2,6 +2,8 @@
 #define UNFOLDINGSHAPES_H
 
 #include <QtWidgets/QMainWindow>
+#include <QMouseEvent>
+#include <QtCore/qtimer.h>
 #include "ui_UnfoldingShapes.h"
 #include "OpenGLWidget.h"
 
@@ -32,8 +34,21 @@ public:
 	}
 
 	// setup
-	void delayedSetup(void m(OpenGLWidget*)) {
+	// set the callback to be called after gl has initialized within the widget
+	void setDelayedSetup(void m(OpenGLWidget*)) {
 		ui.openGLWidget->setAfterGLInit(m);
+	}
+
+	// set the callback for when mouse events occur
+	void setMouseUpdateCallback(void m(QMouseEvent*)) {
+		ui.openGLWidget->setMouseUpdateCallback(m);
+	}
+
+	// the function that should be called once the runner and gl have been initialized
+	void delayedSetup() {
+		mouse = new Mouse();
+
+		cameraSetup();
 	}
 
 	void cameraSetup() {
@@ -42,16 +57,18 @@ public:
 
 		// set camera starting pos
 		//ui.openGLWidget->camera.setPos(origin + glm::vec3(2.0f, 1.0f, -2.0f) * zoom);
-		ui.openGLWidget->camera.setPos(origin + glm::vec3(0.0f, 1.0f, -2.0f) * zoom);
+		ui.openGLWidget->camera.setPos(origin + glm::vec3(0.0f, 0.0f, -3.0f) * zoom);
 		
 		ui.openGLWidget->camera.lookAtTarget(origin);
 
 		// setup controller loop
+		/*
 		controlHZ = 60;
 
-		//controlsTimer = new QTimer(this);
-		//QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateMouse);
-		//controlsTimer->start(1000 / controlHZ);
+		controlsTimer = new QTimer(this);
+		QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateControls);
+		controlsTimer->start(controlHZ);
+		*/
 	}
 
 	void linkShapes(vector<Shape*>* shapes) {
@@ -62,6 +79,18 @@ public:
 
 	void linkAnimator(Animator* animator) {
 		this->animator = animator;
+	}
+
+	void updateMouseControls(QMouseEvent* event) {
+		if (mouse == nullptr) {
+			return;
+		}
+
+		// mouse.update(event);
+
+		// apply camera rotation for the viewer
+		ui.openGLWidget->camera.mouseInputPOV();
+
 	}
 
 	// runtime shape viewer things
@@ -87,7 +116,7 @@ public:
 		backboard->applyTransform();
 
 		// rotate so it is facing the correct way in the viewer
-		shape->asset->setRotation(glm::vec3(0, 45, 0));
+		shape->asset->setRotation(glm::vec3(330, 45, 0));
 		shape->asset->position = origin;
 
 		// stop current animation of the focused shape
@@ -127,7 +156,7 @@ public:
 	}
 
 	void setupBackBoard() {
-		backboard = new Backboard(shapes, glm::vec3(0, -25, 50));
+		backboard = new Backboard(shapes, glm::vec3(0, 10, 50));
 	}
 
 	// utility
@@ -230,13 +259,33 @@ private:
 	glm::vec3 origin;
 	float zoom;
 
+	struct Mouse {
+		glm::vec2 pos;
+
+		bool left;
+		bool right;
+
+		Mouse() {
+			left = false;
+			right = true;
+
+			pos = glm::vec2(0);
+		}
+
+		void update(QMouseEvent* event) {
+			if (event->button() == Qt::LeftButton && event->modifiers().) {
+				left = true;
+			}
+
+			pos = glm::vec2(event->localPos().x, event->localPos().y);
+		}
+	};
+
+	Mouse* mouse = nullptr;
+
 	// control loop
 	QTimer* controlsTimer;
 	int controlHZ;
-
-	void updateMouse() {
-
-	}
 };
 
 #endif

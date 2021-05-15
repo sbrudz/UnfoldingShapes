@@ -12,13 +12,13 @@ void createRunner(OpenGLWidget *w);
 
 int main(int argc, char *argv[])
 {
-
 	std::cout << "finished compilation" << std::endl;
     QApplication a(argc, argv);
     UnfoldingShapes w;
 	wPointer = &w;
 
-	w.delayedSetup(&createRunner);
+	w.setDelayedSetup(&createRunner);
+	w.setMouseUpdateCallback(&mouseUpdate);
 
 	w.show();
 
@@ -29,4 +29,8 @@ int main(int argc, char *argv[])
 
 void createRunner(OpenGLWidget *w) {
 	runner = new Runner(w, wPointer);
+}
+
+void mouseUpdate(QMouseEvent* event) {
+	wPointer->updateMouseControls(event);
 }

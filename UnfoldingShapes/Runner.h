@@ -1,8 +1,8 @@
 #ifndef RUNNER_H
 #define RUNNER_H
 
-#include <qobject.h>
-#include <qtimer.h>
+#include <QtCore/qobject.h>
+#include <QtCore/qtimer.h>
 
 #include "OpenGLWidget.h"
 #include "UnfoldingShapes.h"
@@ -133,7 +133,7 @@ public:
 		// set links and setup
 		ui->linkAnimator(&animator);
 		ui->linkShapes(shapes);
-		ui->cameraSetup();
+		ui->delayedSetup();
 
 		// add assets
 		//shapes.push_back(new Shape(backpackModel));
