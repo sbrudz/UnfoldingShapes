@@ -35,7 +35,6 @@ public:
 
 	// delayed callback for init after gl is initialized
 	void(*afterGLInit)(OpenGLWidget*) = nullptr;
-	void(*mouseUpdateCallback)(QMouseEvent*) = nullptr;
 
 	Camera camera;
 
@@ -89,10 +88,6 @@ public:
 
 	void setAfterGLInit(void m(OpenGLWidget*)) {
 		afterGLInit = m;
-	}
-
-	void setMouseUpdateCallback(void m(QMouseEvent*)) {
-		mouseUpdateCallback = m;
 	}
 
 	void initializeGL() override {
@@ -202,16 +197,7 @@ public:
 		*/
 
 		// callback and then original class
-		mouseUpdateCallback(event);
 		QOpenGLWidget::mousePressEvent(event);
-	}
-
-	bool mouseInsideWindow(glm::vec2 pos) {
-		if (pos.x > 0 && pos.y > 0 && pos.x < width() && pos.y < height()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	// legacy mouse handling

@@ -184,6 +184,8 @@ public:
 		yoffset *= sensitivity * senseMultiplier;
 		yaw += xoffset;
 		pitch += yoffset;
+
+		updateCameraVectors();
 	}
 
 	void lookAtTarget(glm::vec3 target) {

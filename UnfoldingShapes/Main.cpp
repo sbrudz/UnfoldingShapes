@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
 	wPointer = &w;
 
 	w.setDelayedSetup(&createRunner);
-	w.setMouseUpdateCallback(&mouseUpdate);
 
 	w.show();
 
@@ -29,8 +28,4 @@ int main(int argc, char *argv[])
 
 void createRunner(OpenGLWidget *w) {
 	runner = new Runner(w, wPointer);
-}
-
-void mouseUpdate(QMouseEvent* event) {
-	wPointer->updateMouseControls(event);
 }

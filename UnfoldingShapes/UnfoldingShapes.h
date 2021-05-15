@@ -27,6 +27,9 @@ public:
 
 		// select shape in list
 		connect(ui.listWidget, &QListWidget::itemClicked, this, &UnfoldingShapes::selectShape);
+
+		// enable controls
+		ui.openGLWidget->installEventFilter(this);
 	}
 
 	OpenGLWidget* getGraphics() {
@@ -39,36 +42,11 @@ public:
 		ui.openGLWidget->setAfterGLInit(m);
 	}
 
-	// set the callback for when mouse events occur
-	void setMouseUpdateCallback(void m(QMouseEvent*)) {
-		ui.openGLWidget->setMouseUpdateCallback(m);
-	}
-
 	// the function that should be called once the runner and gl have been initialized
 	void delayedSetup() {
 		mouse = new Mouse();
 
 		cameraSetup();
-	}
-
-	void cameraSetup() {
-		origin = glm::vec3(0);
-		zoom = 4.0f;
-
-		// set camera starting pos
-		//ui.openGLWidget->camera.setPos(origin + glm::vec3(2.0f, 1.0f, -2.0f) * zoom);
-		ui.openGLWidget->camera.setPos(origin + glm::vec3(0.0f, 0.0f, -3.0f) * zoom);
-		
-		ui.openGLWidget->camera.lookAtTarget(origin);
-
-		// setup controller loop
-		/*
-		controlHZ = 60;
-
-		controlsTimer = new QTimer(this);
-		QObject::connect(controlsTimer, &QTimer::timeout, this, &UnfoldingShapes::updateControls);
-		controlsTimer->start(controlHZ);
-		*/
 	}
 
 	void linkShapes(vector<Shape*>* shapes) {
@@ -81,16 +59,56 @@ public:
 		this->animator = animator;
 	}
 
-	void updateMouseControls(QMouseEvent* event) {
+	void cameraSetup() {
+		origin = glm::vec3(0);
+		zoom = 12.0f;
+
+		currentMousePos = glm::vec2(0);
+
+		// set camera starting pos
+		//ui.openGLWidget->camera.setPos(origin + glm::normalize(glm::vec3(0.0f, 0.5f, -1.0f)) * zoom);
+		ui.openGLWidget->camera.setPos(origin + glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f)) * zoom);
+
+		ui.openGLWidget->camera.lookAtTarget(origin);
+	}
+
+	bool eventFilter(QObject *obj, QEvent *event) override {
+		if (obj == ui.openGLWidget && (event->type() == QEvent::MouseMove 
+			|| event->type() == QEvent::MouseButtonPress 
+			|| event->type() == QEvent::MouseButtonRelease)) {
+			updateMouse(event);
+		}
+
+		return false;
+	}
+
+	void updateMouse(QEvent* event) {
 		if (mouse == nullptr) {
 			return;
 		}
 
-		// mouse.update(event);
+		// Make the mouse input addative (so the camera stays in the same position when the mouse releases and then presses again)
+		// this way when the button is first placed, the large jump is ignored since mouse resets the positon and pos - mouse->pos is zero again
+		if (event->type() == QEvent::MouseMove) {
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+			glm::vec2 pos = glm::vec2(mouseEvent->localPos().x(), mouseEvent->localPos().y());
+			currentMousePos = currentMousePos + pos - mouse->pos;
+		}
 
-		// apply camera rotation for the viewer
-		ui.openGLWidget->camera.mouseInputPOV();
+		mouse->update(event);
 
+		// apply camera rotation for the viewer and transformation
+		ui.openGLWidget->camera.mouseInputPOV(currentMousePos.x, currentMousePos.y);
+
+		ui.openGLWidget->camera.setPos(origin + ui.openGLWidget->camera.Front * -1.0f * zoom);
+	}
+
+	bool mouseInsideWindow(glm::vec2 pos) {
+		if (pos.x > 0 && pos.y > 0 && pos.x < width() && pos.y < height()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	// runtime shape viewer things
@@ -116,7 +134,6 @@ public:
 		backboard->applyTransform();
 
 		// rotate so it is facing the correct way in the viewer
-		shape->asset->setRotation(glm::vec3(330, 45, 0));
 		shape->asset->position = origin;
 
 		// stop current animation of the focused shape
@@ -259,33 +276,43 @@ private:
 	glm::vec3 origin;
 	float zoom;
 
+	// mouse stuff
+
 	struct Mouse {
+		UnfoldingShapes* parent = nullptr;
+
 		glm::vec2 pos;
 
 		bool left;
 		bool right;
 
 		Mouse() {
+			this->parent = parent;
+
 			left = false;
 			right = true;
 
 			pos = glm::vec2(0);
 		}
 
-		void update(QMouseEvent* event) {
-			if (event->button() == Qt::LeftButton && event->modifiers().) {
+		void update(QEvent* event) {
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+
+			if (event->type() == QEvent::MouseButtonPress) {
 				left = true;
 			}
 
-			pos = glm::vec2(event->localPos().x, event->localPos().y);
+			if (event->type() == QEvent::MouseButtonRelease) {
+				left = false;
+			}
+
+			pos = glm::vec2(mouseEvent->localPos().x(), mouseEvent->localPos().y());
 		}
 	};
 
 	Mouse* mouse = nullptr;
 
-	// control loop
-	QTimer* controlsTimer;
-	int controlHZ;
+	glm::vec2 currentMousePos;
 };
 
 #endif
