@@ -61,22 +61,31 @@ public:
 
 	void cameraSetup() {
 		origin = glm::vec3(0);
-		zoom = 12.0f;
-
+		
+		maxZoom = 100;
+		minZoom = 1;
+		maxSteps = 10000;
+		currentZoomStep = 7640;
+		zoom = calculateZoom(currentZoomStep);
 		currentMousePos = glm::vec2(0);
 
 		// set camera starting pos
 		//ui.openGLWidget->camera.setPos(origin + glm::normalize(glm::vec3(0.0f, 0.5f, -1.0f)) * zoom);
-		ui.openGLWidget->camera.setPos(origin + glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f)) * zoom);
+		ui.openGLWidget->camera.setPos(origin + glm::normalize(glm::vec3(0.0f, 0.75f, -1.0f)) * zoom);
 
 		ui.openGLWidget->camera.lookAtTarget(origin);
 	}
 
 	bool eventFilter(QObject *obj, QEvent *event) override {
-		if (obj == ui.openGLWidget && (event->type() == QEvent::MouseMove 
-			|| event->type() == QEvent::MouseButtonPress 
-			|| event->type() == QEvent::MouseButtonRelease)) {
-			updateMouse(event);
+		if (obj == ui.openGLWidget) {
+			if (event->type() == QEvent::MouseMove
+				|| event->type() == QEvent::MouseButtonPress
+				|| event->type() == QEvent::MouseButtonRelease) {
+				updateMouse(event);
+			}
+			else if (event->type() == QEvent::Wheel) {
+				processScroll(static_cast<QWheelEvent *>(event));
+			}
 		}
 
 		return false;
@@ -87,6 +96,7 @@ public:
 			return;
 		}
 
+		// MOUSE MOVEMENT of CAMERA
 		// Make the mouse input addative (so the camera stays in the same position when the mouse releases and then presses again)
 		// this way when the button is first placed, the large jump is ignored since mouse resets the positon and pos - mouse->pos is zero again
 		if (event->type() == QEvent::MouseMove) {
@@ -99,6 +109,24 @@ public:
 
 		// apply camera rotation for the viewer and transformation
 		ui.openGLWidget->camera.mouseInputPOV(currentMousePos.x, currentMousePos.y);
+
+		// apply limits to the rotation (so we don't clip the table
+		if (ui.openGLWidget->camera.pitch > 0) {
+			ui.openGLWidget->camera.pitch = 0;
+		}
+
+		ui.openGLWidget->camera.setPos(origin + ui.openGLWidget->camera.Front * -1.0f * zoom);
+	}
+
+	// apply zoom
+	void processScroll(QWheelEvent *event) {
+		currentZoomStep -= event->angleDelta().y();
+
+		zoom = calculateZoom(currentZoomStep);
+
+		if (zoom < 0) {
+			zoom = 0;
+		}
 
 		ui.openGLWidget->camera.setPos(origin + ui.openGLWidget->camera.Front * -1.0f * zoom);
 	}
@@ -178,6 +206,16 @@ public:
 	}
 
 	// utility
+
+	float calculateZoom(int step) {
+		float logMinZoom = log(minZoom);
+		float logMaxZoom = log(maxZoom);
+
+		float logZoom = logMinZoom + (logMaxZoom - logMinZoom) * step / (maxSteps - 1);
+		
+		return exp(logZoom);
+	}
+
 	bool setUnfold(Shape* shape, int index) {
 		switch (index) {
 		case 0:
@@ -301,6 +339,10 @@ private:
 	// camera settings
 	glm::vec3 origin;
 	float zoom;
+	float currentZoomStep;
+	float minZoom;
+	float maxZoom;
+	float maxSteps;
 
 	// mouse stuff
 

@@ -139,9 +139,8 @@ public:
 		if (faceMap.rootNode == nullptr) {
 			return glm::vec3(0);
 		}
-
 		
-		return faceMap.rootNode->data->mesh->avgPos;
+		return faceMap.rootNode->data->mesh->getAvgPos();
 	}
 
 private:
@@ -200,8 +199,8 @@ private:
 						// make sure the axis is valid and has a neighbor
 						if (current->data->axis[h]->sharedAxis != nullptr) {
 							// identify leftover points to compare to find the angle
-							glm::vec3 vertex1 = current->data->mesh->avgPos;
-							glm::vec3 vertex2 = current->data->axis[h]->neighborFace->mesh->avgPos;
+							glm::vec3 vertex1 = current->data->mesh->getAvgPos();
+							glm::vec3 vertex2 = current->data->axis[h]->neighborFace->mesh->getAvgPos();
 
 							/*
 							for (int k = 0; k < current->data->mesh->indices.size(); k++) {
@@ -233,6 +232,29 @@ private:
 		}
 	}
 
+	// rotate the entire shape so that the base face is perfectly level to the ground
+	void levelBase() {
+		// find normal of base
+		glm::vec3 normal = faceMap.rootNode->data->mesh->getNormal();
+		glm::vec3 line = normal * glm::vec3(1,0,1);
+		if (line.x != 0) {
+			line.x = 1 / line.x;
+		}
+		if (line.z != 0) {
+			line.z = 1 / line.z;
+		}
+
+		line = glm::vec3(1 / line.x, line.y, 1 / line.z);
+
+		glm::vec3 pos = faceMap.rootNode->data->mesh->getAvgPos();
+
+		Face::Axis* axis = new Face::Axis(line * -1.0f, line * 1.0f);
+
+		float deltaAngle = axis->orientedAngle(pos, glm::vec3(0, -1, 0));
+
+		// FIND A WAY TO ROTATE EULER ANGLES BY AXIS
+	}
+
 	void initFaces() {
 		for (int i = 0; i < model->meshes.size(); i++) {
 			faces.push_back(new Face(&model->meshes[i]));
@@ -251,16 +273,22 @@ private:
 		Face* largest = faces[0];
 
 		for (int i = 1; i < faces.size(); i++) {
-			if (faces[i]->mesh->avgPos.y < largest->mesh->avgPos.y) {
+			if (faces[i]->mesh->getAvgPos().y < largest->mesh->getAvgPos().y) {
 				largest = faces[i];
 			}
 		}
 
+		/*
+		// sort by the largest side aswell
 		for (int i = 1; i < faces.size(); i++) {
 			if (faces[i]->getArea() > largest->getArea()) {
 				largest = faces[i];
 			}
 		}
+		*/
+
+		// make sure that the model is rotated so the base is parallel to the ground
+		//levelBase();
 
 		// make the faceMap
 		faceMap = Graph<Face>(largest);

@@ -159,7 +159,7 @@ public:
 
 		breadthPopulation(shape->faceMap.rootNode, solution);
 
-		std::cout << solution->size << std::endl;
+		// std::cout << solution->size << std::endl;
 
 		return solution;
 	}
@@ -172,7 +172,7 @@ public:
 
 		randomBreadthPopulation(shape->faceMap.rootNode, solution);
 
-		std::cout << solution->size << std::endl;
+		// std::cout << solution->size << std::endl;
 
 		return solution;
 	}

@@ -86,7 +86,7 @@ public:
 			for (unsigned int i = 0; i < meshes.size(); i++) {
 				swapped = false;
 				for (unsigned int j = 0; j < meshes.size() - 1 - i; j++) {
-					if (glm::distance(meshes[sorted[j]].avgPos, camera.pos) > glm::distance(meshes[sorted[j + 1]].avgPos, camera.pos)) {
+					if (glm::distance(meshes[sorted[j]].getAvgPos(), camera.pos) > glm::distance(meshes[sorted[j + 1]].getAvgPos(), camera.pos)) {
 						int temp = sorted[j];
 						sorted[j] = sorted[j + 1];
 						sorted[j + 1] = temp;

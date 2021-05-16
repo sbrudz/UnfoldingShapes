@@ -74,9 +74,6 @@ public:
 
 	unsigned int VAO;
 
-	//average position of all the verticies
-	glm::vec3 avgPos;
-
 	//number of samples for multisampling
 	int samples;
 
@@ -92,8 +89,6 @@ public:
 		this->textures = textures;
 		this->materials = materials;
 		this->samples = samples;
-
-		avgPos = calcAvgPos();
 
 		this->backupVertices = vertices;
 
@@ -196,6 +191,31 @@ public:
 		rebuildMesh();
 	}
 
+	glm::vec3 getAvgPos() {
+		glm::vec3 total(0.0f);
+
+		for (int i = 0; i < vertices.size(); i++) {
+			total += vertices[i].Position;
+		}
+
+		total /= vertices.size();
+
+		return total;
+	}
+
+	// returns the normal to the shape
+	glm::vec3 getNormal() {
+		glm::vec3 normalSum = glm::vec3(0);
+
+		for (int i = 0; i < indices.size(); i += 3) {
+			glm::vec3 newNormal = glm::triangleNormal(vertices[indices[i]].Position, vertices[indices[i + 1]].Position, vertices[indices[i + 2]].Position);
+
+			normalSum += newNormal;
+		}
+
+		return normalSum * (1.0f / (indices.size() / 3));
+	}
+
 private:
 	QOpenGLFunctions_3_3_Core **f;
 
@@ -256,25 +276,13 @@ private:
 	}
 
 	void recompileNormals() {
-		for (int i = 0; i < indices.size(); i+=3) {
-			glm::vec3 newNormal = glm::triangleNormal(vertices[indices[i]].Position, vertices[indices[i + 1]].Position, vertices[indices[i + 2]].Position);
+		glm::vec3 newNormal = getNormal();
 
+		for (int i = 0; i < indices.size(); i+=3) {
 			vertices[indices[i]].Normal = newNormal;
 			vertices[indices[i+1]].Normal = newNormal;
 			vertices[indices[i+2]].Normal = newNormal;
 		}
-	}
-
-	glm::vec3 calcAvgPos() {
-		glm::vec3 total(0.0f);
-
-		for (int i = 0; i < vertices.size(); i++) {
-			total += vertices[i].Position;
-		}
-
-		total /= vertices.size();
-
-		return total;
 	}
 };
 #endif

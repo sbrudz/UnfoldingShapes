@@ -27,6 +27,9 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
+	// overrides the rotation variable and makes sure the model stays rotated when rotation is reset to vec3(0)
+	glm::vec3 localRotation;
+
 	Asset() {
 
 	}
@@ -37,6 +40,8 @@ public:
 		this->position = position;
 		this->rotation = glm::vec3(0.0f);
 		this->scale = glm::vec3(1.0f);
+
+		this->localRotation = glm::vec3(0);
 	}
 
 	Asset(Model *model) {
@@ -47,6 +52,8 @@ public:
 		position = glm::vec3(0.0f);
 		rotation = glm::vec3(0.0f);
 		scale = glm::vec3(1.0f);
+
+		this->localRotation = glm::vec3(0);
 	}
 
 	Asset(Model *model, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
@@ -57,6 +64,8 @@ public:
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
+
+		this->localRotation = glm::vec3(0);
 	}
 
 	void setPosition(glm::vec3 position) {
