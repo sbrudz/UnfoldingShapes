@@ -133,8 +133,8 @@ public:
 		// move the current focus back to its position
 		backboard->applyTransform();
 
-		// rotate so it is facing the correct way in the viewer
-		shape->asset->position = origin;
+		// align the position correctly
+		shape->asset->position = origin - shape->getBasePos();
 
 		// stop current animation of the focused shape
 		if (focusedShape != nullptr) {

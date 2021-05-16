@@ -133,6 +133,17 @@ public:
 			appliedTransformations.erase(appliedTransformations.begin() + i);
 		}
 	}
+
+	// returns the local position of the base
+	glm::vec3 getBasePos() {
+		if (faceMap.rootNode == nullptr) {
+			return glm::vec3(0);
+		}
+
+		
+		return faceMap.rootNode->data->mesh->avgPos;
+	}
+
 private:
 	// recursivley populate the faceMap
 	void populateFaceMap(Graph<Face>::Node* node, vector<Face*> &faces) {

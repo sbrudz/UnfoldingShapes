@@ -12,7 +12,7 @@ uniform vec3 overrideColor = vec3(1.0);
 //effect info
 //color changer
 uniform vec3 effectColor = vec3(1.0,1.0,1.0);
-uniform float effectColorStrength = 0.5;
+uniform float effectColorStrength = 0;
 
 //light info
 uniform bool enableLighting = false;

@@ -44,6 +44,8 @@ public:
 	const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
 	const char* humanoidModel = "resources\\objects\\simplehumanoid\\simplehumanoid.obj";
 
+	const char* testPath = "resources\\objects\\table\\LP_worksplace.obj";
+
 	// legacy
 	const char* fourModel = "resources\\objects\\3dfourconnect\\3dfourconnectFIXED.obj";
 
@@ -96,6 +98,9 @@ public:
 
 	QTimer *timer;
 
+	Model* testModel;
+	Asset* testObj;
+
 	Runner(OpenGLWidget* graphics, UnfoldingShapes* ui, QObject* parent = nullptr) : QObject(parent) {
 		this->graphics = graphics;
 		this->ui = ui;
@@ -109,7 +114,12 @@ public:
 		QObject::connect(timer, &QTimer::timeout, this, &Runner::frame);
 		timer->start(1000/fps);
 
-		// add all the models that are going to be used immediatley
+		// add all static objects to the scene
+		testModel = new Model(&(graphics->f), testPath, graphics->samples);
+		testObj = new Asset(testModel);
+		testObj->setRotation(glm::vec3(0, 0, 0));
+
+		graphics->addAsset(testObj);
 
 		// set skybox
 		// graphics->setSkybox(cloudySkybox);
