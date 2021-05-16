@@ -142,6 +142,7 @@ public:
 		}
 
 		focusedShape = shape;
+		focusedShape->asset->setRotation(glm::vec3(0));
 
 		// autostart animation
 		applySettings();
@@ -173,7 +174,7 @@ public:
 	}
 
 	void setupBackBoard() {
-		backboard = new Backboard(shapes, glm::vec3(0, 10, 50));
+		backboard = new Backboard(this, shapes, glm::vec3(0, 10, 50));
 	}
 
 	// utility
@@ -211,8 +212,15 @@ public:
 		backboard->applyTransform();
 	}
 
-	struct Backboard {
+	struct Backboard : QObject {
+		UnfoldingShapes* parent;
+
 		vector<Shape*>* shapes;
+
+		// update timer for backboard animation
+		QTimer* timer;
+		int updateLoopHZ = 30;
+		float rotationSpeed = 2;
 
 		// top left
 		glm::vec3 position;
@@ -224,13 +232,19 @@ public:
 		glm::vec2 seperation;
 
 		// position is the top center of the backboard
-		Backboard(vector<Shape*>* shapes, glm::vec3 position, int width = 5, glm::vec2 seperation = glm::vec2(5,5)) {
+		Backboard(UnfoldingShapes *parent, vector<Shape*>* shapes, glm::vec3 position, int width = 5, glm::vec2 seperation = glm::vec2(5,5)) : QObject(nullptr) {
+			this->parent = parent;
 			this->shapes = shapes;
 			this->width = width;
 			this->seperation = seperation;
 			this->position = position;
 
 			applyTransform();
+
+			// setup update loop
+			timer = new QTimer(this);
+			QObject::connect(timer, &QTimer::timeout, this, &Backboard::updateLoop);
+			timer->start(updateLoopHZ);
 		}
 
 		// move all the assets of the shapes to their proper position
@@ -250,6 +264,18 @@ public:
 				if (col >= width) {
 					col = 0;
 					row++;
+				}
+			}
+		}
+
+		void updateLoop() {
+			// rotate the shapes on the backboard if it is not focused
+			for (int i = 0; i < shapes->size(); i++) {
+				if ((*shapes)[i] != parent->focusedShape) {
+					(*shapes)[i]->asset->setRotation((*shapes)[i]->asset->rotation + glm::normalize(glm::vec3(1, 2, 3)) * rotationSpeed);
+				}
+				else {
+					// do nothing
 				}
 			}
 		}
