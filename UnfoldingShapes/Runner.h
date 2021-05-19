@@ -149,8 +149,11 @@ public:
 		//shapes.push_back(new Shape(backpackModel));
 		//shapes.push_back(new Shape(humanoidModel));
 		//shapes.push_back(new Shape(ballModel));
-		addShape(new Shape(cubeModel, graphics));
-		addShape(new Shape(dodecahedronModel, graphics));
+
+		addShapeFromFile(cubeModel);
+		addShapeFromFile(dodecahedronModel);
+		addShapeFromFile(ballModel);
+		addShapeFromFile(humanoidModel);
 
 		// fps and game init
 		fpsCount = 0;
@@ -210,6 +213,11 @@ public:
 
 		// std::cout << sleepDuration << std::endl;
 		Sleep(sleepDuration);
+	}
+
+	// shortcut for adding files
+	void addShapeFromFile(const char* str) {
+		addShape(new Shape(str, graphics));
 	}
 
 	// add shape to animator

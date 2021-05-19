@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QMouseEvent>
+#include <QtWidgets/qfiledialog.h>
 #include <QtCore/qtimer.h>
 #include "ui_UnfoldingShapes.h"
 #include "OpenGLWidget.h"
@@ -24,6 +25,9 @@ public:
 
 		// apply button
 		connect(ui.applyProperties, &QPushButton::released, this, &UnfoldingShapes::applySettings);
+
+		// add shape button
+		connect(ui.selectFileButton, &QPushButton::released, this, &UnfoldingShapes::selectFile);
 
 		// select shape in list
 		connect(ui.listWidget, &QListWidget::itemClicked, this, &UnfoldingShapes::selectShape);
@@ -52,7 +56,7 @@ public:
 	void linkShapes(vector<Shape*>* shapes) {
 		this->shapes = shapes;
 
-		setupBackBoard();
+		//setupBackBoard();
 	}
 
 	void linkAnimator(Animator* animator) {
@@ -159,7 +163,7 @@ public:
 		}
 
 		// move the current focus back to its position
-		backboard->applyTransform();
+		//backboard->applyTransform();
 
 		// align the position correctly
 		shape->asset->position = origin - shape->getBasePos();
@@ -167,9 +171,11 @@ public:
 		// stop current animation of the focused shape
 		if (focusedShape != nullptr) {
 			animator->getAnimation(focusedShape)->stop();
+			focusedShape->asset->visible = false;
 		}
 
 		focusedShape = shape;
+		focusedShape->asset->visible = true;
 		focusedShape->asset->setRotation(glm::vec3(0));
 
 		// autostart animation
@@ -201,8 +207,26 @@ public:
 		}
 	}
 
+	void selectFile() {
+		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Shape"), "", tr("OBJ File (*.obj)"));
+		char* charFileName = fileName.toLocal8Bit().data();
+
+		std::cout << charFileName << std::endl;
+
+		addShapeFromFile(fileName.toLocal8Bit().data());
+	}
+
+	void addShapeFromFile(const char* str) {
+		Shape* newShape = new Shape(str, ui.openGLWidget);
+
+		shapes->push_back(newShape);
+		ui.openGLWidget->addAsset((*shapes)[shapes->size() - 1]->asset);
+
+		addShapeToList((*shapes)[shapes->size() - 1]);
+	}
+
 	void setupBackBoard() {
-		backboard = new Backboard(this, shapes, glm::vec3(0, 10, 50));
+		//backboard = new Backboard(this, shapes, glm::vec3(0, 10, 50));
 	}
 
 	// utility
@@ -239,6 +263,7 @@ public:
 	}
 
 	void addShapeToList(Shape* shape) {
+		shape->asset->visible = false;
 		ui.listWidget->addItem(shape->name.c_str());
 
 		// apply settings for base setup
@@ -247,7 +272,7 @@ public:
 			animator->addAnimation(shape, true);
 		}
 
-		backboard->applyTransform();
+		//backboard->applyTransform();
 	}
 
 	struct Backboard : QObject {
@@ -334,7 +359,7 @@ private:
 	// viewer pointers
 	Shape* focusedShape;
 
-	Backboard* backboard;
+	//Backboard* backboard;
 
 	// camera settings
 	glm::vec3 origin;
