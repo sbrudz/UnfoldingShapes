@@ -167,6 +167,7 @@ public:
 				shader.setMat4("view", view);
 				shader.setVec3("viewPos", camera.pos);
 
+				
 				// translate model
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, scene[i]->position);

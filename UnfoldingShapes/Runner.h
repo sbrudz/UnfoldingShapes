@@ -43,6 +43,8 @@ public:
 	const char* boardModel = "resources\\objects\\3dmill\\3dmill.obj";
 	const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
 	const char* humanoidModel = "resources\\objects\\simplehumanoid\\simplehumanoid.obj";
+	//const char* rhombicosahedronModel = "resources\\objects\\rhombicosahedron\\rhombicosahedron.obj";
+	const char* icosphereModel = "resources\\objects\\pack1\\Icosphere.obj";
 
 	const char* tablePath = "resources\\objects\\table\\LP_worksplace.obj";
 
@@ -153,7 +155,9 @@ public:
 		addShapeFromFile(cubeModel);
 		addShapeFromFile(dodecahedronModel);
 		addShapeFromFile(ballModel);
-		addShapeFromFile(humanoidModel);
+		//addShapeFromFile(humanoidModel);
+		//addShapeFromFile(rhombicosahedronModel);
+		//addShapeFromFile(icosphereModel);
 
 		// fps and game init
 		fpsCount = 0;

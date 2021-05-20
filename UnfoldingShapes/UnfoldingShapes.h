@@ -175,6 +175,7 @@ public:
 		}
 
 		focusedShape = shape;
+		
 		focusedShape->asset->visible = true;
 		focusedShape->asset->setRotation(glm::vec3(0));
 
@@ -209,11 +210,21 @@ public:
 
 	void selectFile() {
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Shape"), "", tr("OBJ File (*.obj)"));
-		char* charFileName = fileName.toLocal8Bit().data();
+		string strFileName = fileName.toLocal8Bit().data();
 
-		std::cout << charFileName << std::endl;
+		// convert file into a readable format for the program
+		string formatted = "";
+		for (int i = strFileName.length(); i >= 0;  i--) {
+			if (strFileName[i] == '/') {
+				formatted = "\\" + formatted;
+			}
+			else {
+				formatted = strFileName[i] + formatted;
+			}
+		}
 
-		addShapeFromFile(fileName.toLocal8Bit().data());
+		//std::cout << "Added shape from: " << formatted << std::endl;
+		//addShapeFromFile(formatted);
 	}
 
 	void addShapeFromFile(const char* str) {
