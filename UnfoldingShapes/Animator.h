@@ -154,7 +154,7 @@ public:
 private:
 	vector<Animation>* animations;
 
-	static void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
+	void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
 		// add face of node
 		list->push_back(root->data);
 
@@ -164,7 +164,7 @@ private:
 		}
 	}
 
-	static void stepBasedUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+	void stepBasedUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
 		float miniProgress = 1.0f / root->graph->size;
 
 		vector<Graph<Face>::Node*> queue;
@@ -245,7 +245,7 @@ private:
 	}
 
 	// Current working solution
-	static void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+	void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
 		vector<Graph<Face>::Node*> queue;
 
 		queue.push_back(root);

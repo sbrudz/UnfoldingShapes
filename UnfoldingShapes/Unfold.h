@@ -21,6 +21,8 @@
 //prototypes
 template<class RandomIt>
 void random_shuffle(RandomIt first, RandomIt last);
+void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root);
+void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress);
 
 // computes unfold solutions
 static class Unfold {
@@ -178,6 +180,8 @@ public:
 	}
 
 	// returns the xy size of an unfold on a flat plane (returns "0,0" if there are no vertices)
+	// Shape must have an unfold Assigned!
+	// Assumes that the shape is rotated so the root unfold node is perfectly aligned with the xz plane
 	static glm::vec2 findUnfoldSize(Shape* shape) {
 		// find the position of each vertex in the unraveled 
 		float minx = 0;
@@ -185,12 +189,98 @@ public:
 		float maxx = 0;
 		float maxy = 0;
 
+		// unwrap the shape to measure
+		if (shape->unfold->rootNode) {
+			return glm::vec2(0);
+		}
 
+		// must ensure that the shape is normalized before calculations (reverted-see shape transformation struct)
+		shape->revert();
+		breadthFirstUpdate(shape, shape->unfold->rootNode, 1.0);
 
-		return glm::vec2(0);
+		for (int i = 0; i < shape->faces.size(); i++) {
+			vector<Vertex>* vertices = &(shape->faces[i]->mesh->vertices);
+			
+			for (int j = 0; j < vertices->size(); j++) {
+				glm::vec3 pos = (*vertices)[j].Position;
+
+				if (pos.x < minx) {
+					minx = pos.x;
+				}
+				if (pos.x > maxx) {
+					maxx = pos.x;
+				}
+				if (pos.z < miny) {
+					miny = pos.z;
+				}
+				if (pos.z > maxy) {
+					maxy = pos.z;
+				}
+			}
+		}
+
+		// reset shape to defualt shape and return
+		shape->revert();
+		return glm::vec2(maxx-minx, maxy-miny);
 	}
 };
 
+void recursiveChildCompilation(vector<Face*>* list, Graph<Face>::Node* root) {
+	// add face of node
+	list->push_back(root->data);
+
+	// process children of node
+	for (int i = 0; i < root->connections.size(); i++) {
+		recursiveChildCompilation(list, root->connections[i]);
+	}
+}
+
+void breadthFirstUpdate(Shape* shape, Graph<Face>::Node* root, float progress) {
+	vector<Graph<Face>::Node*> queue;
+
+	queue.push_back(root);
+
+	Graph<Face>::Node* current;
+
+	// debugging tool to identify axis
+	int facesVisited = 0;
+
+	while (!queue.empty()) {
+		current = queue[0];
+		queue.erase(queue.begin());
+
+		//std::cout << "New Animation Frame:" << std::endl;
+
+		for (int i = 0; i < current->connections.size(); i++) {
+			facesVisited += 1;
+
+			// find axis
+			Face::Axis* axis = nullptr;
+
+			for (int x = 0; x < current->data->axis.size(); x++) {
+				if (current->data->axis[x]->neighborFace == current->connections[i]->data) {
+					axis = current->data->axis[x];
+
+					//axis->print();
+
+					break;
+				}
+			}
+
+			// apply to children
+			if (axis != nullptr) {
+				// use the method to add all child faces attatched to the current face for the transformation of the shape.
+				vector<Face*> appliedFaces = vector<Face*>();
+				recursiveChildCompilation(&appliedFaces, current->connections[i]);
+
+				// apply to the shape
+				shape->transform(1 * (axis->originalAngle) * progress, axis, appliedFaces);
+
+				queue.push_back(current->connections[i]);
+			}
+		}
+	}
+}
 
 template<class RandomIt>
 void random_shuffle(RandomIt first, RandomIt last)

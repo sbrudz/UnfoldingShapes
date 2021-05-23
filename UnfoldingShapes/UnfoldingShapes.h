@@ -200,6 +200,10 @@ public:
 
 			setUnfold(current, unfoldSetting);
 
+			// measure unfold bounds to adjust position to
+			std::cout << glm::to_string(Unfold::findUnfoldSize(current)) << std::endl;
+
+			// startup animator
 			Animator::Animation* animation = animator->getAnimation(current);
 			animation->setAlgorithm(animationSetting);
 			animation->speed = speed;
