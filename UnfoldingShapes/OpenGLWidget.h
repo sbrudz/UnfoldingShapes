@@ -24,11 +24,6 @@
 class OpenGLWidget : public QOpenGLWidget {
 public:
 	// tools
-	// mouse state, POV for point of view camera and controls, MOUSE for normal mouse movement detection and no camera effect.
-	enum MouseControlState { POV, MOUSE, CUSTOM };
-
-	// add all models before you start making assets
-	// a simple graphicsengine (uses multisampling x4)
 
 	// start of class code
 	QOpenGLFunctions_3_3_Core *f;
@@ -52,12 +47,6 @@ public:
 
 	// list of the physical models with all the transforms applied
 	std::vector<Asset*> scene;
-
-	// mouse modes
-	MouseControlState mouseMode;
-
-	bool clampMouse;
-	bool pastClampMouse;
 
 	// temp testing vars
 	unsigned int VAO;
@@ -106,9 +95,6 @@ public:
 		// for textures
 		// stbi_set_flip_vertically_on_load(true);
 
-		// mouse control State default
-		setMouseMode(MouseControlState::POV);
-
 		// light setup
 		light = Light(f, "resources/shaders/light.vs", "resources/shaders/light.fs");
 
@@ -122,19 +108,12 @@ public:
 		
 		f->glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 
-
 		// after init
 		afterGLInit(this);
 	}
 
 	void paintGL() override {
 		f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
-
-		// process input
-		// optional camera input
-		if (mouseMode != MouseControlState::CUSTOM) {
-			//camera.processInput(window);
-		}
 
 		// prep for render
 		f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,22 +178,6 @@ public:
 
 		// callback and then original class
 		QOpenGLWidget::mousePressEvent(event);
-	}
-
-	// legacy mouse handling
-	// switch Mouse Modes
-	void setMouseMode(MouseControlState state) {
-		if (state == MouseControlState::POV) {
-			mouseMode = state;
-			clampMouse = true;
-		}
-		else if (state == MouseControlState::MOUSE) {
-			clampMouse = false;
-			mouseMode = state;
-		}
-		else {
-			mouseMode = state;
-		}
 	}
 
 	// color is 0-1 so white is (1,1,1)

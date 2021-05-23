@@ -176,6 +176,19 @@ public:
 
 		return solution;
 	}
+
+	// returns the xy size of an unfold on a flat plane (returns "0,0" if there are no vertices)
+	static glm::vec2 findUnfoldSize(Shape* shape) {
+		// find the position of each vertex in the unraveled 
+		float minx = 0;
+		float miny = 0;
+		float maxx = 0;
+		float maxy = 0;
+
+
+
+		return glm::vec2(0);
+	}
 };
 
 

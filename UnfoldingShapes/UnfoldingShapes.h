@@ -1,6 +1,8 @@
 #ifndef UNFOLDINGSHAPES_H
 #define UNFOLDINGSHAPES_H
 
+#include <filesystem>
+
 #include <QtWidgets/QMainWindow>
 #include <QMouseEvent>
 #include <QtWidgets/qfiledialog.h>
@@ -212,19 +214,86 @@ public:
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Shape"), "", tr("OBJ File (*.obj)"));
 		string strFileName = fileName.toLocal8Bit().data();
 
-		// convert file into a readable format for the program
-		string formatted = "";
-		for (int i = strFileName.length(); i >= 0;  i--) {
-			if (strFileName[i] == '/') {
-				formatted = "\\" + formatted;
+		string formatted = formatPath(strFileName);
+
+		std::cout << std::endl << "Added shape from: " << formatted << std::endl;
+
+		ui.openGLWidget->makeCurrent();
+		addShapeFromFile(formatted.c_str());
+		ui.openGLWidget->doneCurrent();
+	}
+
+	// add all obj files from the specified directory
+	void selectFolder() {
+		QString fileName = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly);
+		string strFileName = fileName.toLocal8Bit().data();
+
+		addShapesFromFolder(strFileName);
+	}
+
+	// return the filename of a file (eg: input="file.txt" output="file")
+	string getFileName(string path) {
+		string output = "";
+
+		bool passed = false;
+		for (int i = path.length() - 1; i >= 0; i--) {
+			if (path[i] == '.') {
+				passed = true;
+				i--;
 			}
-			else {
-				formatted = strFileName[i] + formatted;
+			if (path[i] == '/' || path[i] == '\\') {
+				break;
+			}
+			if (passed == true) {
+				output = path[i] + output;
 			}
 		}
 
-		//std::cout << "Added shape from: " << formatted << std::endl;
-		//addShapeFromFile(formatted);
+		return output;
+	}
+
+	// get the file type off the end of an extension (eg: input="file.txt" output="txt")
+	string getFileType(string path) {
+		string output = "";
+
+		for (int i = path.length() - 1; i >= 0; i--) {
+			if (path[i] == '.') {
+				break;
+			}
+
+			output = path[i] + output;
+		}
+
+		return output;
+	}
+
+	// enter filepath and it will turn all '/' into "\\"
+	string formatPath(string str) {
+		// convert file into a readable format for the program
+		string formatted = "";
+		for (int i = str.length(); i >= 0; i--) {
+			if (str[i] == '/') {
+				formatted = "\\" + formatted;
+			}
+			else {
+				formatted = str[i] + formatted;
+			}
+		}
+
+		return formatted;
+	}
+
+	// enter the unformatted filepath (eg: "C:/Users/user1/shapes")
+	void addShapesFromFolder(string folderPath) {
+		for (const auto & file : std::filesystem::directory_iterator::directory_iterator(folderPath)) {
+			string path = file.path().string();
+
+			if (getFileType(path) == "obj") {
+				ui.openGLWidget->makeCurrent();
+				addShapeFromFile(formatPath(path).c_str());
+				ui.openGLWidget->doneCurrent();
+			}
+		}
 	}
 
 	void addShapeFromFile(const char* str) {

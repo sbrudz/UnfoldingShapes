@@ -245,7 +245,6 @@ private:
 		// load data into vertex buffers
 		(*f)->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-
 		//Tip from learnopengl.com
 		//A great thing about structs is that their memory layout is sequential for all its items.
 		//The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
@@ -282,6 +281,18 @@ private:
 			vertices[indices[i]].Normal = newNormal;
 			vertices[indices[i+1]].Normal = newNormal;
 			vertices[indices[i+2]].Normal = newNormal;
+		}
+	}
+
+	void printVertices() {
+		std::cout << "Vertices: " << std::endl;
+		for (int i = 0; i < vertices.size(); i++) {
+			std::cout << glm::to_string(vertices[i].Position) << std::endl;
+		}
+
+		std::cout << "Indices: ";
+		for (int i = 0; i < indices.size(); i++) {
+			std::cout << indices[i] << ", ";
 		}
 	}
 };
