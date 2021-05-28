@@ -43,7 +43,7 @@ public:
 	const char* boardModel = "resources\\objects\\3dmill\\3dmill.obj";
 	const char* backpackModel = "resources\\objects\\testing\\backpack\\backpack.obj";
 	const char* humanoidModel = "resources\\objects\\simplehumanoid\\simplehumanoid.obj";
-	//const char* rhombicosahedronModel = "resources\\objects\\rhombicosahedron\\rhombicosahedron.obj";
+	const char* rhombicosahedronModel = "resources\\objects\\rhombicosahedron\\rhombicosahedron.obj";
 	const char* icosphereModel = "resources\\objects\\pack1\\Icosphere.obj";
 
 	const char* tablePath = "resources\\objects\\table\\LP_worksplace.obj";
@@ -134,10 +134,6 @@ public:
 		//graphics->addText("FPS: 0", "fps", 1, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
 		//graphics->addText("Position: " + glm::to_string(graphics->camera.pos), "position", 63, 95, 0.5f, glm::vec3(1.0, 0.0, 0.0));
 
-		// set callbacks
-		//glfwSetCursorPosCallback(graphics->window, mouse_callback_custom);
-		//glfwSetMouseButtonCallback(graphics->window, mouse_button_callback_custom);
-
 		// setup shapes
 		shapes = new vector<Shape*>;
 		animator = Animator();
@@ -154,7 +150,7 @@ public:
 
 		addShapeFromFile(cubeModel);
 		addShapeFromFile(dodecahedronModel);
-		addShapeFromFile(ballModel);
+		//addShapeFromFile(ballModel);
 		//addShapeFromFile(humanoidModel);
 		//addShapeFromFile(rhombicosahedronModel);
 		//addShapeFromFile(icosphereModel);

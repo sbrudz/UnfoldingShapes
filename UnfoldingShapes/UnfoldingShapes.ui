@@ -49,9 +49,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>410</y>
+       <y>469</y>
        <width>200</width>
-       <height>400</height>
+       <height>341</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -247,7 +247,7 @@
       <property name="geometry">
        <rect>
         <x>60</x>
-        <y>360</y>
+        <y>300</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -289,7 +289,7 @@
        <x>0</x>
        <y>0</y>
        <width>200</width>
-       <height>410</height>
+       <height>471</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -356,7 +356,7 @@
         <x>0</x>
         <y>350</y>
         <width>200</width>
-        <height>80</height>
+        <height>121</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -399,6 +399,42 @@
        </property>
        <property name="text">
         <string>Select File</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="selectFolderLabel">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>200</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Select Folder of OBJ Shapes</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="selectFolderButton">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>85</y>
+         <width>100</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Select Folder</string>
        </property>
       </widget>
      </widget>

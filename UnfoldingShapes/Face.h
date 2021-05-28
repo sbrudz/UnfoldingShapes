@@ -9,8 +9,10 @@
 
 #include <shader.h>
 
+#include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "Mesh.h"
 
@@ -25,7 +27,8 @@ public:
 	glm::vec3 rot;
 
 	struct Axis {
-		const float marginOfError = 0.001f;
+		// smallest possible float
+		const float marginOfError = 0.0001;
 		const float sizeCap = 1000.0f;
 
 		// stores the axis with a point for refrence and the vector of the line

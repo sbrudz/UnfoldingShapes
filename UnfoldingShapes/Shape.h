@@ -104,12 +104,16 @@ public:
 	// init Shape by setting the asset and registering all of the faces.
 	// Copies the model because we are manipulating the face and vertex info.
 	Shape(string const &path, OpenGLWidget* graphics, glm::vec3 pos = glm::vec3(0), glm::vec3 rot = glm::vec3(0), glm::vec3 scale = glm::vec3(1)) {
+		name = getNameFromPath(path);
+		std::cout << "started loading: " << name << std::endl;
+
 		this->model = new Model(&(graphics->f), path, graphics->samples);
+		std::cout << "Meshes: " << this->model->meshes.size() << std::endl;
 		asset = new Asset(this->model, pos, rot, scale);
 
-		name = getNameFromPath(path);
-
 		initFaces();
+
+		std::cout << "finished loading: " << name << std::endl;
 	}
 
 	void setUnfold(Graph<Face>* newSolution) {

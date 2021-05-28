@@ -31,6 +31,9 @@ public:
 		// add shape button
 		connect(ui.selectFileButton, &QPushButton::released, this, &UnfoldingShapes::selectFile);
 
+		// add folder shape button
+		connect(ui.selectFolderButton, &QPushButton::released, this, &UnfoldingShapes::selectFolder);
+
 		// select shape in list
 		connect(ui.listWidget, &QListWidget::itemClicked, this, &UnfoldingShapes::selectShape);
 
@@ -53,6 +56,8 @@ public:
 		mouse = new Mouse();
 
 		cameraSetup();
+
+		tableBounds = glm::vec2(15, 18) * 0.75f;
 	}
 
 	void linkShapes(vector<Shape*>* shapes) {
@@ -167,9 +172,6 @@ public:
 		// move the current focus back to its position
 		//backboard->applyTransform();
 
-		// align the position correctly
-		shape->asset->position = origin - shape->getBasePos();
-
 		// stop current animation of the focused shape
 		if (focusedShape != nullptr) {
 			animator->getAnimation(focusedShape)->stop();
@@ -200,8 +202,11 @@ public:
 
 			setUnfold(current, unfoldSetting);
 
+			// align the y position correctly
+			focusedShape->asset->position = origin - focusedShape->getBasePos();
+
 			// measure unfold bounds to adjust position to
-			std::cout << glm::to_string(Unfold::findUnfoldSize(current)) << std::endl;
+			orientUnfoldShape(current, glm::vec2(origin.x, origin.y) - (tableBounds * 0.5f), glm::vec2(origin.x, origin.y) + (tableBounds * 0.5f));
 
 			// startup animator
 			Animator::Animation* animation = animator->getAnimation(current);
@@ -302,11 +307,58 @@ public:
 
 	void addShapeFromFile(const char* str) {
 		Shape* newShape = new Shape(str, ui.openGLWidget);
-
+		
 		shapes->push_back(newShape);
 		ui.openGLWidget->addAsset((*shapes)[shapes->size() - 1]->asset);
 
 		addShapeToList((*shapes)[shapes->size() - 1]);
+	}
+
+	// Change the position and scale of a shape so that when it is unfolded, it fits within the specified bounds
+	// specify the bounds with the rectangle formed by corner 1 and corner 2
+	void orientUnfoldShape(Shape* shape, glm::vec2 corner1, glm::vec2 corner2) {
+		glm::vec2 unfoldCorner1, unfoldCorner2;
+		std::tie(unfoldCorner1, unfoldCorner2) = Unfold::findUnfoldSize(shape);
+
+		glm::vec2 bounds = glm::abs(corner2 - corner1);
+		glm::vec2 unfoldBounds = glm::abs(unfoldCorner2 - unfoldCorner1);
+
+		// POSITION
+		glm::vec2 newBounds = glm::vec2(0);
+		// decide which dimension to lock the unfold to (width or height)
+		// if unfoldBounds height is larger proportionally than the table bounds
+		float scaleFactor;
+		if (bounds.y / bounds.x < unfoldBounds.y / unfoldBounds.x) {
+			// process height based
+			newBounds.x = bounds.y * (unfoldBounds.x / unfoldBounds.y);
+			newBounds.y = bounds.y;
+
+			scaleFactor = newBounds.y / unfoldBounds.y;
+		}
+		else {
+			// process width based
+			newBounds.y = bounds.x * (unfoldBounds.y / unfoldBounds.x);
+			newBounds.x = bounds.x;
+
+			scaleFactor = newBounds.x / unfoldBounds.x;
+		}
+		shape->asset->setScale(glm::vec3(scaleFactor));
+
+		//std::cout << glm::to_string(bounds) << " " << glm::to_string(newBounds) << std::endl;
+
+		// unfold corner 1 is the smallest x and y so we use that to orient the center
+		// find offset of center and then scale it
+		glm::vec2 transformCenter = -1.0f * vec2Mult((unfoldCorner1 + unfoldBounds * 0.5f), glm::vec2(newBounds.x / unfoldBounds.x, newBounds.y / unfoldBounds.y));
+
+		// orient the corner to corresponding position
+		//shape->asset->setPosition(glm::vec3(transformCenter.x, shape->asset->position.y, transformCenter.y) + origin - glm::vec3((bounds.x - newBounds.x) / 2.0f, 0.0f, (bounds.y - newBounds.y) / 2.0f));
+		shape->asset->setPosition(glm::vec3(transformCenter.x, shape->asset->position.y, transformCenter.y) + origin);
+
+		// adjust y pos so it stays ontop of the table
+		shape->asset->setPosition(shape->asset->position * glm::vec3(1.0f, scaleFactor, 1.0f));
+
+		//std::cout << std::endl << "Final Bounds at pos " << glm::to_string(shape->asset->position) << " and a scale factor of " << scaleFactor << std::endl;
+		Unfold::findUnfoldSize(shape);
 	}
 
 	void setupBackBoard() {
@@ -314,6 +366,9 @@ public:
 	}
 
 	// utility
+	glm::vec2 vec2Mult(glm::vec2 mult1, glm::vec2 mult2) {
+		return glm::vec2(mult1.x*mult2.x, mult1.y*mult2.y);
+	}
 
 	float calculateZoom(int step) {
 		float logMinZoom = log(minZoom);
@@ -452,6 +507,9 @@ private:
 	float minZoom;
 	float maxZoom;
 	float maxSteps;
+
+	// Shape bounds
+	glm::vec2 tableBounds;
 
 	// mouse stuff
 

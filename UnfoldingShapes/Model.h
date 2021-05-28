@@ -492,11 +492,11 @@ private:
 		glm::vec4 plane1 = getPlane(vertices1);
 		glm::vec4 plane2 = getPlane(vertices2);
 
-		plane1 = glm::vec4(glm::normalize(glm::vec3(plane1)), plane1.w);
-		plane2 = glm::vec4(glm::normalize(glm::vec3(plane2)), plane2.w);
+		plane1 = glm::vec4(glm::normalize(plane1));
+		plane2 = glm::vec4(glm::normalize(plane2));
 
 		//std::cout << glm::distance(plane1, plane2) << std::endl;
-		if (glm::distance(plane1, plane2) <= 1.0f) {
+		if (glm::distance(plane1, plane2) <= 0.0001f) {
 			//std::cout << "here" << std::endl;
 			return true;
 		}
