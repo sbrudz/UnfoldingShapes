@@ -37,6 +37,9 @@ public:
 		// select shape in list
 		connect(ui.listWidget, &QListWidget::itemClicked, this, &UnfoldingShapes::selectShape);
 
+		// render menu connections
+		connect(ui.enableTable, &QCheckBox::stateChanged, this, &UnfoldingShapes::checkTable);
+
 		// enable controls
 		ui.openGLWidget->installEventFilter(this);
 	}
@@ -221,6 +224,10 @@ public:
 
 	void selectFile() {
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Shape"), "", tr("OBJ File (*.obj)"));
+
+		// exit if there is no input
+		if (fileName == "") { return; }
+
 		string strFileName = fileName.toLocal8Bit().data();
 
 		string formatted = formatPath(strFileName);
@@ -235,6 +242,10 @@ public:
 	// add all obj files from the specified directory
 	void selectFolder() {
 		QString fileName = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly);
+
+		// exit if there is no input
+		if (fileName == "") { return; }
+
 		string strFileName = fileName.toLocal8Bit().data();
 
 		addShapesFromFolder(strFileName);
@@ -312,6 +323,24 @@ public:
 		ui.openGLWidget->addAsset((*shapes)[shapes->size() - 1]->asset);
 
 		addShapeToList((*shapes)[shapes->size() - 1]);
+	}
+
+	// set the visibility of the table based on check box
+	void checkTable(int state) {
+		bool enabled;
+		switch (state) {
+		case 0:
+			enabled = false;
+			break;
+		default:
+			enabled = true;
+			break;
+		}
+
+		Asset* asset = ui.openGLWidget->getAsset("LP_worksplace");
+		if (asset != nullptr) {
+			asset->visible = enabled;
+		}
 	}
 
 	// Change the position and scale of a shape so that when it is unfolded, it fits within the specified bounds

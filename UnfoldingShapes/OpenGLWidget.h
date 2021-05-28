@@ -207,6 +207,17 @@ public:
 		}
 	}
 
+	// enter the filename (eg: "example_file")
+	Asset* getAsset(string fileName) {
+		for (int i = 0; i < scene.size(); i++) {
+			if (scene[i]->model->name == fileName) {
+				return scene[i];
+			}
+		}
+
+		return nullptr;
+	}
+
 	void generateTestCube() {
 		float cube[] = {
 			// back

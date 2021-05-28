@@ -133,8 +133,9 @@ private:
 		directory = path.substr(0, path.find_last_of('\\'));
 
 		//retrieve the name of the model file
-		std::size_t found = path.find_last_of('\\');
-		name = path.substr(found + 1);
+		//std::size_t found = path.find_last_of('\\');
+		//name = path.substr(found + 1);
+		name = getNameFromPath(path);
 		//std::cout << "Name: " << name << std::endl;
 
 		//process ASSIMP's root node recursively
@@ -473,6 +474,23 @@ private:
 	}
 
 	// utility
+	string getNameFromPath(string path) {
+		string fileName = "";
+
+		for (int i = 0; i < path.size(); i++) {
+			if (path[i] == '.') {
+				for (int j = i; j >= 0; j--) {
+					if (path[j] == '\\' || path[j] == '/') {
+						fileName = path.substr(j + 1, i - (j + 1));
+						return fileName;
+					}
+				}
+			}
+		}
+
+		return "";
+	}
+
 	glm::vec4 getPlane(vector<Vertex> vert) {
 		float a1 = vert[1].Position.x - vert[0].Position.x;
 		float b1 = vert[1].Position.y - vert[0].Position.y;

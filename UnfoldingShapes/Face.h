@@ -110,8 +110,9 @@ public:
 			p2 = glm::normalize(p2 - point);
 
 			float result = glm::orientedAngle(p1, p2, line);
-
 			result = (result/(sqrt(result*result)))*3.1415926535 - result;
+
+			// std::cout << "result: " << result << std::endl;
 
 			return result;
 		}
